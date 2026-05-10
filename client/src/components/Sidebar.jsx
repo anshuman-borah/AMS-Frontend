@@ -4,7 +4,7 @@ import { LayoutDashboard, FilePlus, FileText, LogOut } from "lucide-react";
 const NAV_ITEMS = [
   { label: "Dashboard",       icon: LayoutDashboard, path: "/dashboard" },
   { label: "Submit Proposal", icon: FilePlus,        path: "/submit"    },
-  { label: "My Proposals",    icon: FileText,        path: "/proposals" },
+  { label: "My Proposals",    icon: FileText,        path: "/myproposals" },
 ];
 
 export default function Sidebar({ onLogout }) {

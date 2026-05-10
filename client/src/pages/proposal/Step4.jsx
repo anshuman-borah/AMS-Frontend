@@ -1,4 +1,4 @@
-
+import toast from "react-hot-toast";
 import FormField from "../../components/FormField";
 export default function Step4({ form, update }) {
   const total =
@@ -19,7 +19,14 @@ export default function Step4({ form, update }) {
         <FormField
           label="Non Recurring"
           value={form.nonRecurring}
-          onChange={update("nonRecurring")}
+          onChange={(value) => {
+            
+            if (/^\d*\.?\d*$/.test(value)){
+               update("nonRecurring")(value) ;
+               }   else {
+                toast.error("Only Numbers are allowed ") ; 
+               }         
+          } }
           placeholder="Enter Amount"
         />
 
@@ -27,7 +34,14 @@ export default function Step4({ form, update }) {
         <FormField
           label="Recurring Contingency"
           value={form.recurringContingency}
-          onChange={update("recurringContingency")}
+          onChange={(value) => {
+
+           if (/^\d*\.?\d*$/.test(value)) {
+                  update("recurringContingency")(value);
+          } else {
+                    toast.error("Only numbers are allowed");
+               }
+           }}
           placeholder="Enter Amount"
         />
 
@@ -35,7 +49,14 @@ export default function Step4({ form, update }) {
         <FormField
           label="Travelling Allowances"
           value={form.travellingAllowances}
-          onChange={update("travellingAllowances")}
+          onChange={(value)=>{
+            if (/^\d*\.?\d*$/.test(value)) {
+              update("travellingAllowances")(value) ; 
+            }else {
+              toast.error("Only numbers are allowed");
+            }
+          }
+        }
           placeholder="Enter Amount"
         />
 
@@ -43,17 +64,32 @@ export default function Step4({ form, update }) {
         <FormField
           label="Operational Expenses"
           value={form.operationalExpenses}
-          onChange={update("operationalExpenses")}
+          onChange={(value) =>{
+            if (/^\d*\.?\d*$/.test(value)) {
+              update("operationalExpenses")(value) ; 
+            }else {
+              toast.error("Only numbers are allowed") ; 
+            }
+          }
+        }
           placeholder="Enter Amount"
         />
 
         {/* Manpower */}
-        <FormField
-          label="Manpower"
-          value={form.manpower}
-          onChange={update("manpower")}
-          placeholder="Enter required manpower"
-        />
+             <FormField
+             label="Manpower"
+             value={form.manpower}
+             onChange={(value) => {
+
+                  if (/^\d*\.?\d*$/.test(value)) {
+               update("manpower")(value);
+             } else {
+               toast.error("Only numbers are allowed");
+            }
+
+           }}
+           placeholder="Enter required manpower"
+          />
 
         {/* Grand Total */}
         <div>

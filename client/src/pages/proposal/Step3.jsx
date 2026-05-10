@@ -3,23 +3,27 @@
 import { Plus, X } from "lucide-react";
 import FormField from "../../components/FormField";
 
-export default function Step3({ form, update, addObjective }) {
-  const removeObjective = (index) => {
-    const updatedObjectives = form.objectives.filter(
-      (_, i) => i !== index
-    );
+export default function Step3({
+  form,
+  update,
+  addObjective,
+}) {
 
-    update("objectives")({
-      target: {
-        value: updatedObjectives,
-      },
-    });
+  // Remove Objective
+  const removeObjective = (index) => {
+
+    const updatedObjectives =
+      form.objectives.filter((_, i) => i !== index);
+
+    update("objectives")(updatedObjectives);
   };
 
   return (
     <div>
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
+
         <h2 className="text-2xl font-bold text-gray-800">
           Research Objective
         </h2>
@@ -32,12 +36,19 @@ export default function Step3({ form, update, addObjective }) {
           <Plus size={16} />
           Add Objective
         </button>
+
       </div>
 
       {/* Objectives */}
       <div className="space-y-5">
+
         {form.objectives?.map((objective, index) => (
-          <div key={index} className="relative">
+
+          <div
+            key={index}
+            className="relative"
+          >
+
             {/* Remove Button */}
             {form.objectives.length > 1 && (
               <button
@@ -55,21 +66,26 @@ export default function Step3({ form, update, addObjective }) {
               value={objective}
               rows={3}
               placeholder="Describe the research objective..."
-              onChange={(e) => {
-                const updatedObjectives = [...form.objectives];
 
-                updatedObjectives[index] = e.target.value;
+              onChange={(value) => {
 
-                update("objectives")({
-                  target: {
-                    value: updatedObjectives,
-                  },
-                });
+                const updatedObjectives = [
+                  ...form.objectives,
+                ];
+
+                updatedObjectives[index] = value;
+
+                update("objectives")(
+                  updatedObjectives
+                );
               }}
             />
+
           </div>
         ))}
+
       </div>
+
     </div>
   );
-} 
+}
