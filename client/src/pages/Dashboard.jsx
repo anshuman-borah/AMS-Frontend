@@ -1,29 +1,55 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Sidebar from "../components/Sidebar";
 import StatCard from "../components/StatCard";
 import SimilarityBadge from "../components/SimilarityBadge";
 import { Search, Filter, List, LayoutGrid, Calendar, FileStack, Clock, CheckCircle, XCircle } from "lucide-react";
 
-const PROPOSALS = [
-  { id: "FIG-123", title: "Optimizing Crop Yields and Soil Health", status: "Pending", similarity: 100, submitted: "2026-04-25", discipline: "Agriculture" },
-  { id: "FIG-124", title: "Optimizing Crop Yields and Soil Health", status: "Pending", similarity: 15,  submitted: "2026-04-25", discipline: "Agriculture" },
-  { id: "FIG-125", title: "Optimizing Crop Yields and Soil Health", status: "Pending", similarity: 23,  submitted: "2026-04-25", discipline: "Agriculture" },
-  { id: "FIG-126", title: "Optimizing Crop Yields and Soil Health", status: "Pending", similarity: 15,  submitted: "2026-04-25", discipline: "Agriculture" },
-];
-
-const STATS = [
-  { label: "Total Proposals", value: 24, icon: FileStack,   color: "text-blue-500",   bg: "bg-blue-50"   },
-  { label: "Pending Reviews", value: 8,  icon: Clock,       color: "text-yellow-500", bg: "bg-yellow-50" },
-  { label: "Approved",        value: 12, icon: CheckCircle, color: "text-green-500",  bg: "bg-green-50"  },
-  { label: "Rejected",        value: 4,  icon: XCircle,     color: "text-red-500",    bg: "bg-red-50"    },
-];
 
 const TABLE_HEADERS = ["Project ID", "Title", "Status", "Similarity", "Submitted", "Discipline"];
 
 export default function Dashboard({ onLogout }) {
   const [search, setSearch] = useState("");
 
-  const filtered = PROPOSALS.filter(
+  // BACKEND 
+  const [stats, setStats] = useState(null);
+  const [proposals, setProposals] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+
+  // 
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        const response = await fetch(
+          "https://ams-backend-ktz1.onrender.com/api/dashboard/scientist",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.message || "Failed to fetch dashboard");
+        }
+        setStats(data.statistics);
+        setProposals(data.recentProposals);
+        console.log(data);
+      } catch (error) {
+        console.error(error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchDashboard();
+
+  }, []);
+
+
+
+  const filtered = proposals.filter(
     (p) => !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -60,7 +86,37 @@ export default function Dashboard({ onLogout }) {
 
           {/* Stat Cards */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {STATS.map((s) => <StatCard key={s.label} {...s} />)}
+            <StatCard
+              label="Total Proposals"
+              value={stats?.total || 0}
+              icon={FileStack}
+              color="text-blue-500"
+              bg="bg-blue-50"
+            />
+
+            <StatCard
+              label="Pending Reviews"
+              value={stats?.pending || 0}
+              icon={Clock}
+              color="text-yellow-500"
+              bg="bg-yellow-50"
+            />
+
+            <StatCard
+              label="Approved"
+              value={stats?.approved || 0}
+              icon={CheckCircle}
+              color="text-green-500"
+              bg="bg-green-50"
+            />
+
+            <StatCard
+              label="Rejected"
+              value={stats?.rejected || 0}
+              icon={XCircle}
+              color="text-red-500"
+              bg="bg-red-50"
+            />
           </div>
 
           {/* Table */}
@@ -77,14 +133,22 @@ export default function Dashboard({ onLogout }) {
               <tbody>
                 {filtered.map((p, i) => (
                   <tr key={i} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                    <td className="py-3 pr-4 text-gray-600 font-medium">{p.id}</td>
+                    <td className="py-3 pr-4 text-gray-600 font-medium">{p.id?.slice(-6).toUpperCase() || "0"}</td>
                     <td className="py-3 pr-4 text-gray-700">{p.title}</td>
                     <td className="py-3 pr-4">
-                      <span className="bg-yellow-100 text-yellow-700 text-xs font-semibold px-2 py-0.5 rounded-full">{p.status}</span>
-                    </td>
-                    <td className="py-3 pr-4"><SimilarityBadge value={p.similarity} /></td>
-                    <td className="py-3 pr-4 text-gray-500">{p.submitted}</td>
-                    <td className="py-3 text-gray-500">{p.discipline}</td>
+                      <span
+                        className={`text-xs font-semibold px-2 py-0.5 rounded-full ${p.status === "APPROVED"
+                            ? "bg-green-100 text-green-700"
+                            : p.status === "REJECTED"
+                              ? "bg-red-100 text-red-700"
+                              : "bg-yellow-100 text-yellow-700"
+                          }`}
+                      >
+                        {p.status}
+                      </span>                    </td>
+                    <td className="py-3 pr-4"><SimilarityBadge value={p.similarityScore || 0} /></td>
+                    <td className="py-3 pr-4 text-gray-500">{p.submittedDate ? new Date(p.submittedDate).toLocaleDateString() : "0"}</td>
+                    <td className="py-3 text-gray-500"> {p.discipline || "Not specified"} </td>
                   </tr>
                 ))}
               </tbody>

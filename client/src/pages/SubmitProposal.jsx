@@ -9,6 +9,7 @@ import Step5 from "./proposal/Step5";
 import PrintableProposal from "../components/PrintableProposal";
 import useProposalForm from "../hooks/useProposalForm";
 import { generateProposalPDF } from "../utils/generateProposalPDF";
+import toast from "react-hot-toast";
 
 const STEPS = [
   { number: 1, label: "Basic Info" },
@@ -21,6 +22,7 @@ const STEPS = [
 export default function SubmitProposal({ onLogout }) {
   const printRef = useRef();
   const [currentStep, setCurrentStep] = useState(1);
+  const [submitting, setSubmitting] = useState(false);
 
   const {
     form,
@@ -30,7 +32,55 @@ export default function SubmitProposal({ onLogout }) {
     removeScientist,
   } = useProposalForm();
 
-  const handleSubmit = () => generateProposalPDF(printRef, form);
+  // const handleSubmit = () => generateProposalPDF(printRef, form);
+  // create post interagtion
+  const handleSubmit = async () => {
+    try {
+      setSubmitting(true);
+      const token = localStorage.getItem("token");
+      // adding the payload 
+      const payload = {
+        title: form.title,
+        // domain: form.domain,
+        // category: form.category,
+        // summary: form.summary,
+        objectives: form.objectives,
+      };
+      const response = await fetch(
+        "https://ams-backend-ktz1.onrender.com/api/projects/create",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(payload),
+        }
+      );
+      const data = await response.json();
+      // Adding the  Payload
+
+
+
+
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to submit proposal");
+      }
+      generateProposalPDF(printRef, form);
+      toast.success("Proposal submitted successfully");
+      console.log(data);
+    } catch (error) {
+
+      console.error(error);
+      toast.error(error.message || "Something went wrong");
+    }
+    finally {
+      setSubmitting(false);
+    }
+  };
+
+
 
   return (
     <div className="flex min-h-screen font-sans bg-gray-100">
@@ -94,9 +144,13 @@ export default function SubmitProposal({ onLogout }) {
             {currentStep === 5 ? (
               <button
                 onClick={handleSubmit}
-                className="px-8 py-2 rounded-lg bg-green-600 text-white font-semibold hover:bg-green-700 transition"
+                disabled={submitting}
+                className={`px-8 py-2 rounded-lg text-white font-semibold transition ${submitting
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-green-600 hover:bg-green-700"
+                  }`}
               >
-                Submit Proposal
+                {submitting ? "Submitting..." : "Submit Proposal"}
               </button>
             ) : (
               <button

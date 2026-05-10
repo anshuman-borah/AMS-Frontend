@@ -1,11 +1,53 @@
 import { useState } from "react";
 import { Eye, EyeOff, Layers, Users, Shield } from "lucide-react";
 import logo from "../assets/AMSlogo.png";
+import toast from "react-hot-toast";
 
 export default function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
+  const [loading, setLoading] = useState(false);
+  
+
+const handleLogin = async () => {
+  if (!email || !password) {
+    toast.error("Please enter email and password");
+    return;
+  }
+  try {
+    setLoading(true);
+    const response = await fetch(
+      "https://ams-backend-ktz1.onrender.com/api/auth/login",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email,
+          password,
+        }),
+      }
+    );
+    const data = await response.json();
+    if (!response.ok) {
+      throw new Error(data.message || "Login failed");
+    }
+    // Store authentication data
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("user", JSON.stringify(data.user));
+    // Update authentication state
+    toast.success("Login successful");
+    onLogin(data);
+  } catch (error) {
+    console.error("Login Error:", error);
+    toast.error(error.message || "Something went wrong");
+  } finally {
+    setLoading(false);
+  }
+};
+
 
   return (
     <div className="min-h-screen flex flex-col md:flex-row">
@@ -69,7 +111,7 @@ export default function Login({ onLogin }) {
           </div>
 
           <button
-            onClick={() => email && password && onLogin()}
+            onClick={handleLogin}
             className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
           >
             Login now
