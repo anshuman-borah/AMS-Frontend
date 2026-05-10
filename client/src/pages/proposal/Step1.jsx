@@ -29,15 +29,13 @@ export default function Step1({ form, update }) {
         <FormField
           className="flex-1"
           label="Unique Code"
-          value={form.uniqueCode}
-          onChange={update("uniqueCode")}
-          placeholder="Station/Year/Discipline/Serial No"
+          value={`${Math.floor(100000 + Math.random() * 900000)}`}
+          disabled
         />
 
         <FormField
           className="flex-1"
           label="Stations / Colleges"
-          type="select"
           value={form.station}
           onChange={update("station")}
           options={STATION_OPTIONS}
@@ -46,10 +44,13 @@ export default function Step1({ form, update }) {
         <FormField
           className="w-36"
           label="Year"
-          type="select"
           value={form.year}
-          onChange={update("year")}
-          options={YEAR_OPTIONS}
+          onChange={(value) => {
+            // Allow only numbers and max 4 digits
+            if (/^\d{0,4}$/.test(value)) {
+              update("year")(value);
+            }
+          }}
         />
       </div>
 
@@ -64,7 +65,6 @@ export default function Step1({ form, update }) {
       <FormField
         className="mb-10"
         label="Discipline"
-        type="select"
         value={form.discipline}
         onChange={update("discipline")}
         options={DISCIPLINE_OPTIONS}

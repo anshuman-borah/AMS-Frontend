@@ -10,7 +10,7 @@ import PrintableProposal from "../components/PrintableProposal";
 import useProposalForm from "../hooks/useProposalForm";
 import { generateProposalPDF } from "../utils/generateProposalPDF";
 import toast from "react-hot-toast";
-
+import { useNavigate } from "react-router-dom";
 const STEPS = [
   { number: 1, label: "Basic Info" },
   { number: 2, label: "Details" },
@@ -23,6 +23,7 @@ export default function SubmitProposal({ onLogout }) {
   const printRef = useRef();
   const [currentStep, setCurrentStep] = useState(1);
   const [submitting, setSubmitting] = useState(false);
+  const navigate = useNavigate();
 
   const {
     form,
@@ -41,10 +42,29 @@ export default function SubmitProposal({ onLogout }) {
       // adding the payload 
       const payload = {
         title: form.title,
-        // domain: form.domain,
-        // category: form.category,
-        // summary: form.summary,
+        discipline: form.discipline,
+        year: Number(form.year),
+        introduction: form.introduction,
+        actionPlan: form.actionPlan,
+        expectedOutcome: form.expectedOutcome,
         objectives: form.objectives,
+        budget: {
+          nonRecurring:
+            Number(form.nonRecurring) || 0,
+          recurring:
+            Number(form.recurringContingency) || 0,
+          travel:
+            Number(form.travellingAllowances) || 0,
+          operational:
+            Number(form.operationalExpenses) || 0,
+          manpower:
+            Number(form.manpower) || 0,
+          total:
+            (Number(form.nonRecurring) || 0) +
+            (Number(form.recurringContingency) || 0) +
+            (Number(form.travellingAllowances) || 0) +
+            (Number(form.operationalExpenses) || 0),
+        },
       };
       const response = await fetch(
         "https://ams-backend-ktz1.onrender.com/api/projects/create",
@@ -58,17 +78,22 @@ export default function SubmitProposal({ onLogout }) {
         }
       );
       const data = await response.json();
-      // Adding the  Payload
+      console.log("STATUS:", response.status);
+      console.log("DATA:", data);
 
-
-
-
-
-      if (!response.ok) {
-        throw new Error(data.message || "Failed to submit proposal");
+      if (
+        !response.ok ||
+        data.message === "Please fill all required fields"
+      ) {
+        throw new Error(
+          data.message || "Failed to submit proposal"
+        );
       }
       generateProposalPDF(printRef, form);
       toast.success("Proposal submitted successfully");
+      setTimeout(() => {
+        navigate("/dashboard");
+      }, 1500);
       console.log(data);
     } catch (error) {
 
