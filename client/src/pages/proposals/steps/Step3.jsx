@@ -1,7 +1,7 @@
 // Step3.jsx
 
 import { Plus, X } from "lucide-react";
-import FormField from "../../components/FormField";
+import FormField from "../../../components/common/FormField";
 
 export default function Step3({
   form,

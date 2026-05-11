@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Eye, EyeOff, Layers, Users, Shield } from "lucide-react";
-import logo from "../assets/AMSlogo.png";
+import logo from "../../assets/AMSlogo.png";
 import toast from "react-hot-toast";
 
 export default function Login({ onLogin }) {

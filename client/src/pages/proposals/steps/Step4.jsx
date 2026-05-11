@@ -1,5 +1,6 @@
 import toast from "react-hot-toast";
-import FormField from "../../components/FormField";
+import FormField from "../../../components/common/FormField";
+
 export default function Step4({ form, update }) {
   const total =
     (Number(form.nonRecurring) || 0) +

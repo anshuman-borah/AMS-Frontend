@@ -1,5 +1,6 @@
 import { Plus, X } from "lucide-react";
-import FormField from "../../components/FormField";
+import FormField from "../../../components/common/FormField";
+
 export default function Step5({
   form,
   update,

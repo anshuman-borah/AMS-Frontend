@@ -1,4 +1,4 @@
-import FormField from "../../components/FormField";
+import FormField from "../../../components/common/FormField";
 
 export default function Step2({ form, update }) {
   return (

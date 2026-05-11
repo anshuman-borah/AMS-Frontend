@@ -1,5 +1,6 @@
 import SimilarityBadge from "./SimilarityBadge";
 
+
 const STATUS_STYLES = {
   Accepted: "bg-green-100 text-green-700",
   Rejected: "bg-red-100 text-red-700",

@@ -1,10 +1,10 @@
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useState } from "react";
 
-import Login from "./pages/Login";
-import Dashboard from "./pages/Dashboard";
-import SubmitProposal from "./pages/SubmitProposal";
-import MyProposals from "./pages/MyProposals";
+import Login from "./pages/auth/Login";
+import Dashboard from "./pages/dashboard/Dashboard";
+import SubmitProposal from "./pages/proposals/SubmitProposal";
+import MyProposals from "./pages/proposals/MyProposals";
 
 export default function App() {
 

@@ -1,4 +1,4 @@
-import FormField from "../../components/FormField";
+import FormField from "../../../components/common/FormField";
 
 const STATION_OPTIONS = [
   { value: "station1", label: "Station 1" },

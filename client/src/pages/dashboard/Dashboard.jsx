@@ -1,8 +1,10 @@
 import { useEffect, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import StatCard from "../components/StatCard";
-import SimilarityBadge from "../components/SimilarityBadge";
+import Sidebar from "../../components/common/Sidebar";
+import StatCard from "../../components/common/StatCard";
+import SimilarityBadge from "../../components/proposal/SimilarityBadge";
 import { Search, Filter, List, LayoutGrid, Calendar, FileStack, Clock, CheckCircle, XCircle } from "lucide-react";
+import LoadingScreen from "../../components/common/Loadingscreen";
+import axios from "axios";
 
 
 const TABLE_HEADERS = ["Project ID", "Title", "Status", "Similarity", "Submitted", "Discipline"];
@@ -20,19 +22,16 @@ export default function Dashboard({ onLogout }) {
     const fetchDashboard = async () => {
       try {
         const token = localStorage.getItem("token");
-        const response = await fetch(
+        const response = await axios.get(
           "https://ams-backend-ktz1.onrender.com/api/dashboard/scientist",
           {
-            method: "GET",
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
-        const data = await response.json();
-        if (!response.ok) {
-          throw new Error(data.message || "Failed to fetch dashboard");
-        }
+
+        const data = response.data;
         setStats(data.statistics);
         setProposals(data.recentProposals);
         console.log(data);
@@ -51,7 +50,18 @@ export default function Dashboard({ onLogout }) {
   const filtered = proposals.filter(
     (p) => !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase())
   );
-
+  if (loading) {
+    return (
+      <div className="flex min-h-screen font-sans bg-gray-100">
+        <Sidebar onLogout={onLogout} />
+        <main className="flex-1 p-6 overflow-auto">
+          <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm p-8">
+            <LoadingScreen />
+          </div>
+        </main>
+      </div>
+    );
+  }
   return (
     <div className="flex min-h-screen font-sans bg-gray-100">
       <Sidebar onLogout={onLogout} />
@@ -137,10 +147,10 @@ export default function Dashboard({ onLogout }) {
                     <td className="py-3 pr-4">
                       <span
                         className={`text-xs font-semibold px-2 py-0.5 rounded-full ${p.status === "APPROVED"
-                            ? "bg-green-100 text-green-700"
-                            : p.status === "REJECTED"
-                              ? "bg-red-100 text-red-700"
-                              : "bg-yellow-100 text-yellow-700"
+                          ? "bg-green-100 text-green-700"
+                          : p.status === "REJECTED"
+                            ? "bg-red-100 text-red-700"
+                            : "bg-yellow-100 text-yellow-700"
                           }`}
                       >
                         {p.status}

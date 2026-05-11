@@ -1,14 +1,14 @@
 import { useRef, useState } from "react";
-import Sidebar from "../components/Sidebar";
-import Stepper from "../components/Stepper";
-import Step1 from "./proposal/Step1";
-import Step2 from "./proposal/Step2";
-import Step3 from "./proposal/Step3";
-import Step4 from "./proposal/Step4";
-import Step5 from "./proposal/Step5";
-import PrintableProposal from "../components/PrintableProposal";
-import useProposalForm from "../hooks/useProposalForm";
-import { generateProposalPDF } from "../utils/generateProposalPDF";
+import Sidebar from "../../components/common/Sidebar";
+import Stepper from "../../components/common/Stepper";
+import Step1 from "./steps/Step1";
+import Step2 from "./steps/Step2";
+import Step3 from "./steps/Step3";
+import Step4 from "./steps/Step4";
+import Step5 from "./steps/Step5";
+import PrintableProposal from "../../components/proposal/PrintableProposal";
+import useProposalForm from "../../hooks/useProposalForm";
+import { generateProposalPDF } from "../../utils/generateProposalPDF";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 const STEPS = [
