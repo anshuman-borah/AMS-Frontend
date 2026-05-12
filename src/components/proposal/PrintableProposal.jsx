@@ -1,6 +1,3 @@
-// PrintableProposal.jsx
-// Hidden off-screen component captured by html2canvas for PDF generation.
-// Never visible to the user — positioned at -9999px via parent ref div.
 
 export default function PrintableProposal({ form }) {
   const totalBudget = [

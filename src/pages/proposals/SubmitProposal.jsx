@@ -109,7 +109,10 @@ export default function SubmitProposal({ onLogout }) {
 
   return (
     <div className="flex min-h-screen font-sans bg-gray-100">
-      <Sidebar onLogout={onLogout} />
+      <Sidebar
+       onLogout={onLogout} 
+       user={JSON.parse(localStorage.getItem("user"))}
+       />
 
       {/* ── Hidden printable area (captured by html2canvas) ── */}
       <div

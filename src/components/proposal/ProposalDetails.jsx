@@ -1,20 +1,55 @@
 import { ArrowLeft } from "lucide-react";
+import { useEffect, useState } from "react";
+import LoadingScreen from "../../components/common/Loadingscreen";
+import axios from "axios";
 
 export default function ProposalDetails({ proposal, onBack }) {
-  const objectives = proposal.objectives?.length
-    ? proposal.objectives
-    : [
-        "Develop machine learning models for disease prediction",
-        "Create an intuitive interface for medical professionals",
-        "Validate the system with clinical trials",
-      ];
+  const [projectData, setProjectData] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const objectives = projectData?.project?.objectives || [];
+
+
+  useEffect(() => {
+    if (proposal?.id) {
+      fetchProject();
+    }
+  }, [proposal]);
+
+  const fetchProject = async () => {
+    try {
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        `https://ams-backend-ktz1.onrender.com/api/scientist/project/${proposal.id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      setProjectData(response.data);
+
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  if (loading) {
+    return <LoadingScreen
+      title="Loading Proposal"
+      subtitle="Fetching proposals and statistics..."
+    />;
+  }
+  console.log(projectData);
 
   return (
     <div>
-
       {/* Header */}
       <h1 className="text-3xl font-bold text-gray-900 mb-2">
-        Assigned Reviews
+        Proposal Details
       </h1>
 
       <button
@@ -42,17 +77,17 @@ export default function ProposalDetails({ proposal, onBack }) {
 
               <Block
                 label="Principal Scientist"
-                value={proposal.principalScientist || "Dr. Sharma"}
+                value={projectData?.submittedBy?.name || "Unknown"}
               />
 
               <Block
                 label="Project Title"
-                value={proposal.title}
+                value={projectData?.title}
               />
 
               <Block
                 label="Discipline"
-                value={proposal.discipline || "Computer Science"}
+                value={projectData?.discipline || "Not Specified"}
               />
 
               <div>
@@ -61,8 +96,7 @@ export default function ProposalDetails({ proposal, onBack }) {
                 </p>
 
                 <p className="text-gray-700 leading-7">
-                  {proposal.introduction ||
-                    "This research proposes to develop an advanced AI-based medical diagnosis system that leverages machine learning algorithms to assist healthcare professionals in making accurate diagnosis."}
+                  {projectData?.introduction || "No introduction available"}
                 </p>
               </div>
 
@@ -80,7 +114,7 @@ export default function ProposalDetails({ proposal, onBack }) {
 
               <Block
                 label="Budget"
-                value={proposal.budget || "₹ 45.5 Lakhs"}
+                value={`₹ ${projectData?.budget?.total || 0}`}
               />
 
             </div>
@@ -94,13 +128,17 @@ export default function ProposalDetails({ proposal, onBack }) {
             </h3>
 
             <textarea
-              placeholder="View the comment from the reviewer"
-              className="w-full h-40 border border-gray-200 rounded-lg p-4 resize-none focus:outline-none"
+              value={
+               projectData?.reviews?.[0]?.comment  ||
+                "No review comment available"
+              }
+              readOnly
+              className="w-full h-40 border border-gray-200 rounded-lg p-4 resize-none bg-gray-50 text-gray-700 focus:outline-none"
             />
 
-            <button className="mt-4 px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition">
+            {/* <button className="mt-4 px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition">
               Edit
-            </button>
+            </button> */}
           </div>
         </div>
 
@@ -118,7 +156,7 @@ export default function ProposalDetails({ proposal, onBack }) {
               <span className="text-gray-600">Similarity Score</span>
 
               <span className="text-red-500 font-semibold">
-                {proposal.similarity}%
+                {projectData?.similarityScore || 0}%
               </span>
             </div>
 
@@ -136,33 +174,25 @@ export default function ProposalDetails({ proposal, onBack }) {
 
             <div className="space-y-4">
 
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="font-semibold text-sm">
-                  ML in HealthCare
-                </p>
+              {projectData?.assignedReviewer ? (
+                <div className="bg-gray-50 rounded-lg p-4">
 
-                <p className="text-xs text-gray-500">
-                  Dr. Verma (2025)
-                </p>
+                  <p className="font-semibold text-sm">
+                    {projectData.assignedReviewer.name}
+                  </p>
 
-                <p className="text-orange-500 text-xs mt-1">
-                  18% match
-                </p>
-              </div>
+                  <p className="text-xs text-gray-500">
+                    {projectData.assignedReviewer.email}
+                  </p>
 
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="font-semibold text-sm">
-                  ML in HealthCare
-                </p>
-
-                <p className="text-xs text-gray-500">
-                  Dr. Verma (2025)
-                </p>
-
-                <p className="text-orange-500 text-xs mt-1">
-                  16% match
-                </p>
-              </div>
+                </div>
+              ) : (
+                <div className="bg-gray-50 rounded-lg p-4">
+                  <p className="text-sm text-gray-500">
+                    No reviewer assigned
+                  </p>
+                </div>
+              )}
 
             </div>
           </div>
