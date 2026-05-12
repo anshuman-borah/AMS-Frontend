@@ -53,16 +53,10 @@ export default function Dashboard({ onLogout }) {
   if (loading) {
     return (
       <div className="flex min-h-screen font-sans bg-gray-100">
-        <Sidebar
-          onLogout={onLogout}
-          user={JSON.parse(localStorage.getItem("user"))}
-        />
+        <Sidebar onLogout={onLogout} />
         <main className="flex-1 p-6 overflow-auto">
           <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm p-8">
-            <LoadingScreen
-              title="Preparing Dashboard"
-              subtitle="Fetching project details..."
-            />
+            <LoadingScreen />
           </div>
         </main>
       </div>
@@ -70,10 +64,7 @@ export default function Dashboard({ onLogout }) {
   }
   return (
     <div className="flex min-h-screen font-sans bg-gray-100">
-      <Sidebar
-       onLogout={onLogout}
-       user={JSON.parse(localStorage.getItem("user"))}
-       />
+      <Sidebar onLogout={onLogout} />
 
       <main className="flex-1 p-6 overflow-auto">
         <div className="max-w-7xl mx-auto bg-white rounded-2xl shadow-sm p-8">

@@ -1,9 +1,6 @@
 import { useEffect, useState } from "react";
 
-export default function LoadingScreen({
-  title = "Loading...",
-  subtitle = "Please wait..."
-}) {
+export default function LoadingScreen() {
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
@@ -81,11 +78,11 @@ export default function LoadingScreen({
         {/* Text */}
         <div className="flex flex-col items-center">
           <p className="text-sm font-medium text-gray-700 tracking-wide">
-            {title}
+            Preparing Dashboard
           </p>
 
           <p className="text-xs text-gray-400 mt-1">
-            {subtitle}
+            Fetching proposals and statistics...
           </p>
         </div>
 

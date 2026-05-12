@@ -5,7 +5,6 @@ const STATUS_STYLES = {
   Accepted: "bg-green-100 text-green-700",
   Rejected: "bg-red-100 text-red-700",
   Pending:  "bg-yellow-100 text-yellow-700",
-   DRAFT: "bg-gray-100 text-gray-700",
 };
 
 export default function ProposalTable({ proposals, onView }) {
@@ -31,7 +30,7 @@ export default function ProposalTable({ proposals, onView }) {
             proposals.map((proposal) => (
               <tr key={proposal.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-gray-700">
-                  {proposal.id.slice(-6).toUpperCase()}
+                  {proposal.projectCode}
                 </td>
                 <td className="px-6 py-4 text-gray-600 max-w-xs truncate">
                   {proposal.title}
@@ -42,9 +41,9 @@ export default function ProposalTable({ proposals, onView }) {
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <SimilarityBadge value={proposal.similarityScore} />
+                  <SimilarityBadge value={proposal.similarity} />
                 </td>
-                <td className="px-6 py-4 text-gray-500">{new Date(proposal.createdAt).toLocaleDateString()}</td>
+                <td className="px-6 py-4 text-gray-500">{proposal.submittedDate}</td>
                 <td className="px-6 py-4">
                   <button
                     onClick={() => onView(proposal)}

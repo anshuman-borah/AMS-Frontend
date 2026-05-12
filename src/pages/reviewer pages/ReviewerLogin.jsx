@@ -2,12 +2,14 @@ import { useState } from "react";
 import { Eye, EyeOff, Layers, Users, Shield } from "lucide-react";
 import logo from "../../assets/AMSlogo.png";
 import toast from "react-hot-toast";
+import { useNavigate } from "react-router-dom";
 
-export default function Login({ onLogin }) {
+export default function ReviewerLogin({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail]               = useState("");
   const [password, setPassword]         = useState("");
   const [loading, setLoading]           = useState(false);
+  const navigate = useNavigate();
 
   const handleLogin = async () => {
     if (!email || !password) {
@@ -17,7 +19,7 @@ export default function Login({ onLogin }) {
     try {
       setLoading(true);
       const response = await fetch(
-        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
+        "https://ams-backend-ktz1.onrender.com/api/auth/login",
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -25,17 +27,18 @@ export default function Login({ onLogin }) {
         }
       );
       const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.message || "Login failed");
+      if (!response.ok) throw new Error(data.message || "Login failed");
+
+      // Only allow REVIEWER role
+      if (data.user?.role !== "REVIEWER") {
+        throw new Error("Access denied. This portal is for Reviewers only.");
       }
 
-      // Store auth data
       localStorage.setItem("token", data.token);
       localStorage.setItem("user", JSON.stringify(data.user));
+      localStorage.setItem("reviewerLoggedIn", "true");
 
       toast.success("Login successful");
-
-      // Pass the full response — App.jsx will redirect based on role
       onLogin(data);
     } catch (error) {
       console.error("Login Error:", error);
@@ -63,7 +66,7 @@ export default function Login({ onLogin }) {
             Anusandhan Management System
           </h1>
           <p className="text-gray-300 text-center mb-16">
-            Research Management System
+            Reviewer Portal — Research Review Management
           </p>
           <div className="space-y-10 text-lg text-gray-200">
             {[
@@ -72,7 +75,8 @@ export default function Login({ onLogin }) {
               { icon: Shield, label: "Similarity Detection"   },
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-4">
-                <Icon size={28} /><p>{label}</p>
+                <Icon size={28} />
+                <p>{label}</p>
               </div>
             ))}
           </div>
@@ -82,6 +86,11 @@ export default function Login({ onLogin }) {
       {/* Right Panel */}
       <div className="w-full md:w-1/2 flex items-center justify-center bg-[#F5F7FA] p-4 min-h-screen">
         <div className="w-full max-w-sm bg-white shadow-2xl rounded-2xl p-6 sm:p-8">
+          <div className="flex justify-center mb-2">
+            <span className="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">
+              Reviewer Access
+            </span>
+          </div>
           <h2 className="text-center text-gray-600 mb-6 text-lg font-semibold">
             Login to your account
           </h2>
@@ -131,8 +140,13 @@ export default function Login({ onLogin }) {
           </button>
 
           <p className="text-center text-sm text-gray-400 mt-4">
-            Don't Have An Account?{" "}
-            <span className="text-blue-500 cursor-pointer">Sign Up</span>
+            Are you a Scientist?{" "}
+            <span
+              className="text-blue-500 cursor-pointer hover:underline"
+              onClick={() => navigate("/login")}
+            >
+              Scientist Login
+            </span>
           </p>
         </div>
       </div>
