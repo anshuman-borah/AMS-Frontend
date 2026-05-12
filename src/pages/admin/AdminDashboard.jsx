@@ -1,97 +1,173 @@
-import { useNavigate, useLocation } from "react-router-dom";
+import { useEffect, useState } from "react";
+import axios from "axios";
+
 import {
-  LayoutDashboard,
-  Users,
-  ClipboardList,
-  LogOut,
+  FolderOpen,
+  FileText,
+  Clock,
+  CheckCircle,
+  XCircle,
+  UserCheck,
 } from "lucide-react";
 
-const NAV_ITEMS = [
-  {
-    label: "Dashboard",
-    icon: LayoutDashboard,
-    path: "/admin",
-  },
-  {
-    label: "User Management",
-    icon: Users,
-    path: "/admin/users",
-  },
-  {
-    label: "Reviewer Assignment",
-    icon: ClipboardList,
-    path: "/admin/assignments",
-  },
-];
+import StatCard from "../../components/common/StatCard";
+import LoadingScreen from "../../components/common/Loadingscreen";
 
-export default function AdminSidebar({ onLogout, user }) {
+import AdminSidebar from "../../components/admin/AdminSidebar";
+import DashboardHeader from "../../components/admin/DashboardHeader";
+import DashboardCharts from "../../components/admin/DashboardCharts";
+import RecentProjects from "../../components/admin/RecentProjects";
+import RecentReviews from "../../components/admin/RecentReviews";
+import ReviewerWorkload from "../../components/admin/ReviewerWorkload";
 
-  const navigate = useNavigate();
-  const { pathname } = useLocation();
+export default function AdminDashboard({ onLogout, user }) {
+  const [dashboardData, setDashboardData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  // API Calling
+  useEffect(() => {
+    const fetchDashboard = async () => {
+      try {
+        const token = localStorage.getItem("token");
+
+        const res = await axios.get(
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/admin`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        setDashboardData(res.data);
+      } catch (err) {
+        console.error(err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboard();
+  }, []);
+
+  const STATS = [
+    {
+      label: "Projects",
+      value: dashboardData?.statistics?.projects?.total || 0,
+      icon: FolderOpen,
+      color: "text-blue-600",
+      bg: "bg-blue-100",
+    },
+    {
+      label: "Draft",
+      value: dashboardData?.statistics?.projects?.draft || 0,
+      icon: FileText,
+      color: "text-purple-600",
+      bg: "bg-purple-100",
+    },
+    {
+      label: "Pending",
+      value: dashboardData?.statistics?.projects?.pending || 0,
+      icon: Clock,
+      color: "text-yellow-600",
+      bg: "bg-yellow-100",
+    },
+    {
+      label: "Approved",
+      value: dashboardData?.statistics?.projects?.approved || 0,
+      icon: CheckCircle,
+      color: "text-green-600",
+      bg: "bg-green-100",
+    },
+    {
+      label: "Rejected",
+      value: dashboardData?.statistics?.projects?.rejected || 0,
+      icon: XCircle,
+      color: "text-red-600",
+      bg: "bg-red-100",
+    },
+    {
+      label: "Reviewers",
+      value: dashboardData?.statistics?.users?.reviewers || 0,
+      icon: UserCheck,
+      color: "text-indigo-600",
+      bg: "bg-indigo-100",
+    },
+  ];
 
   return (
-    <aside className="w-64 bg-[#071B34] text-white flex flex-col min-h-screen">
+    <div className="flex min-h-screen bg-gray-50">
+      
+      {/* Sidebar */}
+      <AdminSidebar
+        onLogout={onLogout}
+        user={user}
+      />
 
-      {/* Header */}
-      <div className="px-5 py-6 border-b border-white/10">
-        <h1 className="text-2xl font-bold">
-          Research Portal
-        </h1>
-      </div>
+      {/* Main Content */}
+      <main className="flex-1 overflow-y-auto px-8 py-8">
 
-      {/* Navigation */}
-      <nav className="flex-1 px-3 py-6 space-y-2">
+        {loading ? (
 
-        {NAV_ITEMS.map(({ label, icon: Icon, path }) => (
-
-          <button
-            key={label}
-            onClick={() => navigate(path)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition ${
-              pathname === path
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-white/10"
-            }`}
-          >
-            <Icon size={18} />
-            {label}
-          </button>
-
-        ))}
-
-      </nav>
-
-      {/* User */}
-      <div className="border-t border-white/10 p-4">
-
-        <div className="flex items-center gap-3 mb-4">
-
-          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold">
-            {user?.name?.charAt(0)?.toUpperCase() || "A"}
+          <div className="h-full flex items-center justify-center">
+            <LoadingScreen />
           </div>
 
-          <div>
-            <p className="font-semibold text-sm">
-              {user?.name}
-            </p>
+        ) : !dashboardData ? (
 
-            <p className="text-xs text-gray-400">
-              {user?.role}
-            </p>
+          <div className="p-10 text-red-500 font-semibold">
+            Failed to load dashboard data
           </div>
 
-        </div>
+        ) : (
 
-        <button
-          onClick={onLogout}
-          className="flex items-center gap-2 text-sm text-gray-300 hover:text-red-400"
-        >
-          <LogOut size={16} />
-          Log out
-        </button>
+          <>
+            {/* Header */}
+            <DashboardHeader />
 
-      </div>
+            {/* Stats */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
 
-    </aside>
+              {STATS.map((s) => (
+                <StatCard
+                  key={s.label}
+                  label={s.label}
+                  value={s.value}
+                  icon={s.icon}
+                  color={s.color}
+                  bg={s.bg}
+                />
+              ))}
+
+            </div>
+
+            {/* Charts */}
+            <DashboardCharts
+              charts={dashboardData?.charts}
+            />
+
+            {/* Projects + Reviews */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+
+              <RecentProjects
+                projects={dashboardData?.recentProjects || []}
+              />
+
+              <RecentReviews
+                reviews={dashboardData?.recentReviews || []}
+              />
+
+            </div>
+
+            {/* Reviewer Workload */}
+            <ReviewerWorkload
+              reviewers={dashboardData?.reviewerWorkload || []}
+            />
+          </>
+
+        )}
+
+      </main>
+    </div>
   );
 }

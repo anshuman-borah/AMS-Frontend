@@ -22,6 +22,36 @@ export default function MyProposals({ onLogout }) {
       p.projectCode.toLowerCase().includes(search.toLowerCase())
   );
 
+  useEffect(() => {
+    fetchProposals();
+  }, [currentPage]);
+
+  const fetchProposals = async () => {
+    try {
+      setLoading(true);
+
+      const token = localStorage.getItem("token");
+
+      const response = await axios.get(
+        `${import.meta.env.VITE_API_BASE_URL}/api/scientist/my-proposals?page=${currentPage}&limit=${LIMIT}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+
+
+      setProposals(response.data.proposals || []);
+      setTotalPages(response.data.pagination.totalPages);
+    } catch (error) {
+      console.log(error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="flex min-h-screen font-sans bg-gray-100">
       <Sidebar onLogout={onLogout} />
