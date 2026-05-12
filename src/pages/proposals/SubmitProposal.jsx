@@ -67,7 +67,7 @@ export default function SubmitProposal({ onLogout }) {
         },
       };
       const response = await fetch(
-        "https://ams-backend-ktz1.onrender.com/api/projects/create",
+        `${import.meta.env.VITE_API_BASE_URL}/api/projects/create`,
         {
           method: "POST",
           headers: {

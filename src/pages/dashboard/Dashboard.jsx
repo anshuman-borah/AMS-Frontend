@@ -23,7 +23,7 @@ export default function Dashboard({ onLogout }) {
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          "https://ams-backend-ktz1.onrender.com/api/dashboard/scientist",
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/scientist`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

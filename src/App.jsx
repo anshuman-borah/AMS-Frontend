@@ -7,6 +7,9 @@ import SubmitProposal from "./pages/proposals/SubmitProposal";
 import MyProposals from "./pages/proposals/MyProposals";
 import AdminDashboard from "./pages/admin/AdminDashboard";
 import ReviewerDashboard from "./pages/reviewer/Reviewerdashboard";
+import UserManagement from "./pages/admin/UserManagement";
+import ProposalManagement from "./pages/admin/ProposalManagement";
+import ReviewerAssignment from "./pages/admin/ReviewerAssignment";
 
 export default function App() {
 
@@ -42,10 +45,10 @@ export default function App() {
           element={
             loggedIn
               ? <Navigate to={
-                  userRole === "admin" ? "/admin" :
+                userRole === "admin" ? "/admin" :
                   userRole === "reviewer" ? "/reviewer" :
-                  "/dashboard"
-                } />
+                    "/dashboard"
+              } />
               : <Login onLogin={handleLogin} />
           }
         />
@@ -53,48 +56,98 @@ export default function App() {
         {/* Scientist only */}
         <Route path="/dashboard" element={
           !loggedIn ? <Navigate to="/login" /> :
-          userRole === "admin" ? <Navigate to="/admin" /> :
-          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
-          <Dashboard onLogout={handleLogout} />
+            userRole === "admin" ? <Navigate to="/admin" /> :
+              userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+                <Dashboard onLogout={handleLogout} />
         } />
 
         <Route path="/submit" element={
           !loggedIn ? <Navigate to="/login" /> :
-          userRole === "admin" ? <Navigate to="/admin" /> :
-          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
-          <SubmitProposal onLogout={handleLogout} />
+            userRole === "admin" ? <Navigate to="/admin" /> :
+              userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+                <SubmitProposal onLogout={handleLogout} />
         } />
 
         <Route path="/myproposals" element={
           !loggedIn ? <Navigate to="/login" /> :
-          userRole === "admin" ? <Navigate to="/admin" /> :
-          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
-          <MyProposals onLogout={handleLogout} />
+            userRole === "admin" ? <Navigate to="/admin" /> :
+              userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+                <MyProposals onLogout={handleLogout} />
         } />
 
         {/* Admin only */}
         <Route path="/admin" element={
           !loggedIn ? <Navigate to="/login" /> :
-          userRole === "admin" ? <AdminDashboard onLogout={handleLogout} /> :
-          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
-          <Navigate to="/dashboard" />
+            userRole === "admin" ? <AdminDashboard onLogout={handleLogout} /> :
+              userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+                <Navigate to="/dashboard" />
         } />
+
+        <Route
+          path="/admin/users"
+          element={
+            !loggedIn ? (
+              <Navigate to="/login" />
+            ) : userRole === "admin" ? (
+              <UserManagement onLogout={handleLogout} />
+            ) : userRole === "reviewer" ? (
+              <Navigate to="/reviewer" />
+            ) : (
+              <Navigate to="/dashboard" />
+            )
+          }
+        />
+
+        <Route
+          path="/admin/proposals"
+          element={
+            !loggedIn ? (
+              <Navigate to="/login" />
+            ) : userRole === "admin" ? (
+              <ProposalManagement
+                onLogout={handleLogout}
+              />
+            ) : userRole === "reviewer" ? (
+              <Navigate to="/reviewer" />
+            ) : (
+              <Navigate to="/dashboard" />
+            )
+          }
+        />
+
+        <Route
+          path="/admin/assignments"
+          element={
+            !loggedIn ? (
+              <Navigate to="/login" />
+            ) : userRole === "admin" ? (
+              <ReviewerAssignment
+                onLogout={handleLogout}
+              />
+            ) : userRole === "reviewer" ? (
+              <Navigate to="/reviewer" />
+            ) : (
+              <Navigate to="/dashboard" />
+            )
+          }
+        />
+
 
         {/* Reviewer only */}
         <Route path="/reviewer" element={
           !loggedIn ? <Navigate to="/login" /> :
-          userRole === "reviewer" ? <ReviewerDashboard onLogout={handleLogout} /> :
-          userRole === "admin" ? <Navigate to="/admin" /> :
-          <Navigate to="/dashboard" />
+            userRole === "reviewer" ? <ReviewerDashboard onLogout={handleLogout} /> :
+              userRole === "admin" ? <Navigate to="/admin" /> :
+                <Navigate to="/dashboard" />
         } />
 
         {/* Catch-all */}
         <Route path="*" element={
           <Navigate to={
             !loggedIn ? "/login" :
-            userRole === "admin" ? "/admin" :
-            userRole === "reviewer" ? "/reviewer" :
-            "/dashboard"
+              userRole === "admin" ? "/admin" :
+                userRole === "reviewer" ? "/reviewer" :
+                  "/dashboard"
           } />
         } />
 

@@ -18,7 +18,7 @@ export default function Login({ onLogin }) {
     try {
       setLoading(true);
       const response = await fetch(
-        "https://ams-backend-ktz1.onrender.com/api/auth/login",
+        `${import.meta.env.VITE_API_BASE_URL}/api/auth/login`,
         {
           method: "POST",
           headers: {

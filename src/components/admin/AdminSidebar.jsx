@@ -18,6 +18,11 @@ const NAV_ITEMS = [
     path: "/admin/users",
   },
   {
+    label: "Proposal Management",
+    icon: ClipboardList,
+    path: "/admin/proposals",
+  },
+  {
     label: "Reviewer Assignment",
     icon: ClipboardList,
     path: "/admin/assignments",
@@ -29,31 +34,33 @@ export default function AdminSidebar({ onLogout, user }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
 
-  return (
-    <aside className="w-64 bg-[#071B34] text-white flex flex-col min-h-screen">
+  // FIX
+  const currentUser =
+    user || JSON.parse(localStorage.getItem("user")) || {};
 
-      {/* Logo */}
-      <div className="px-5 py-6 border-b border-white/10">
-        <h1 className="text-2xl font-bold">
+  return (
+    <aside className="w-60 bg-[#0B1E35] flex flex-col text-white shrink-0 h-screen sticky top-0">
+
+      <div className="px-4 py-4 border-b border-white/10">
+        <p className="text-xl font-bold tracking-wide text-gray-100">
           Research Portal
-        </h1>
+        </p>
       </div>
 
-      {/* Nav */}
-      <nav className="flex-1 px-3 py-6 space-y-2">
+      <nav className="flex-1 px-2 py-4 space-y-1">
 
         {NAV_ITEMS.map(({ label, icon: Icon, path }) => (
 
           <button
             key={label}
             onClick={() => navigate(path)}
-            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm transition ${
+            className={`w-full flex items-center gap-2 px-3 py-2 rounded-lg text-sm transition-all border-l-4 ${
               pathname === path
-                ? "bg-blue-600 text-white"
-                : "text-gray-300 hover:bg-white/10"
+                ? "bg-blue-600 text-white font-semibold border-blue-300"
+                : "text-gray-300 hover:bg-white/10 border-transparent"
             }`}
           >
-            <Icon size={18} />
+            <Icon size={16} />
             {label}
           </button>
 
@@ -61,36 +68,39 @@ export default function AdminSidebar({ onLogout, user }) {
 
       </nav>
 
-      {/* User */}
-      <div className="border-t border-white/10 p-4">
+      <div className="px-3 py-4 border-t border-white/10">
 
-        <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-2 mb-3">
 
-          <div className="w-10 h-10 rounded-full bg-blue-500 flex items-center justify-center font-bold">
-            {user?.name?.charAt(0)?.toUpperCase() || "A"}
+          <div className="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center text-xs font-bold">
+
+            {currentUser?.name?.charAt(0)?.toUpperCase() || "U"}
+
           </div>
 
           <div>
-            <p className="font-semibold text-sm">
-              {user?.name}
+
+            <p className="text-sm font-semibold">
+              {currentUser?.name || "Unknown User"}
             </p>
 
             <p className="text-xs text-gray-400">
-              {user?.role}
+              {currentUser?.role || "Scientist"}
             </p>
+
           </div>
 
         </div>
 
         <button
           onClick={onLogout}
-          className="flex items-center gap-2 text-sm text-gray-300 hover:text-red-400"
+          className="flex items-center gap-2 text-sm text-gray-400 hover:text-red-400 transition-colors"
         >
-          <LogOut size={16} />
-          Log out
+          <LogOut size={16} /> Log out
         </button>
 
       </div>
+
     </aside>
   );
 }

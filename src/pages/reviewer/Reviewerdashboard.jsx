@@ -64,7 +64,7 @@ export default function ReviewerDashboard({ onLogout }) {
       try {
         const token = localStorage.getItem("token");
         const res = await axios.get(
-          "https://ams-backend-ktz1.onrender.com/api/dashboard/reviewer",
+          `${import.meta.env.VITE_API_BASE_URL}/api/dashboard/reviewer`,
           { headers: { Authorization: `Bearer ${token}` } }
         );
         setProposals(res.data.proposals || []);

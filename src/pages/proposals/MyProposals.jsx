@@ -41,7 +41,7 @@ export default function MyProposals({ onLogout }) {
       const token = localStorage.getItem("token");
 
       const response = await axios.get(
-        `https://ams-backend-ktz1.onrender.com/api/scientist/my-proposals?page=${currentPage}&limit=${LIMIT}`,
+        `${import.meta.env.VITE_API_BASE_URL}/api/scientist/my-proposals?page=${currentPage}&limit=${LIMIT}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
