@@ -1,15 +1,27 @@
 import { useNavigate, useLocation } from "react-router-dom";
-import { LayoutDashboard, FilePlus, FileText, LogOut } from "lucide-react";
+import { LayoutDashboard, ClipboardList, LogOut } from "lucide-react";
 
 const NAV_ITEMS = [
-  { label: "Dashboard",       icon: LayoutDashboard, path: "/dashboard" },
-  { label: "Submit Proposal", icon: FilePlus,        path: "/submit"    },
-  { label: "My Proposals",    icon: FileText,        path: "/myproposals" },
+  { label: "Dashboard",        icon: LayoutDashboard, path: "/reviewer/dashboard" },
+  { label: "Assigned Reviews", icon: ClipboardList,   path: "/reviewer/assigned"  },
 ];
 
-export default function Sidebar({ onLogout }) {
+export default function ReviewerSidebar({ onLogout }) {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+
+  // Read logged-in reviewer from localStorage
+  const user = (() => {
+    try { return JSON.parse(localStorage.getItem("user")) || {}; }
+    catch { return {}; }
+  })();
+
+  const initials = (user.name || "RV")
+    .split(" ")
+    .map((w) => w[0])
+    .join("")
+    .slice(0, 2)
+    .toUpperCase();
 
   return (
     <aside className="w-60 bg-[#0B1E35] flex flex-col text-white shrink-0 h-screen sticky top-0">
@@ -37,11 +49,11 @@ export default function Sidebar({ onLogout }) {
       <div className="px-3 py-4 border-t border-white/10">
         <div className="flex items-center gap-2 mb-3">
           <div className="w-8 h-8 rounded-full bg-blue-400 flex items-center justify-center text-xs font-bold">
-            SC
+            {initials}
           </div>
           <div>
-            <p className="text-sm font-semibold">Dr. Sarah Chen</p>
-            <p className="text-xs text-gray-400">Scientist</p>
+            <p className="text-sm font-semibold truncate max-w-[110px]">{user.name || "Reviewer"}</p>
+            <p className="text-xs text-gray-400">Reviewer</p>
           </div>
         </div>
         <button
