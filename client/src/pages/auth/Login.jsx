@@ -5,48 +5,49 @@ import toast from "react-hot-toast";
 
 export default function Login({ onLogin }) {
   const [showPassword, setShowPassword] = useState(false);
-  const [email, setEmail]       = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  
 
-const handleLogin = async () => {
-  if (!email || !password) {
-    toast.error("Please enter email and password");
-    return;
-  }
-  try {
-    setLoading(true);
-    const response = await fetch(
-      "https://ams-backend-ktz1.onrender.com/api/auth/login",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          email,
-          password,
-        }),
-      }
-    );
-    const data = await response.json();
-    if (!response.ok) {
-      throw new Error(data.message || "Login failed");
+
+  const handleLogin = async () => {
+    if (!email || !password) {
+      toast.error("Please enter email and password");
+      return;
     }
-    // Store authentication data
-    localStorage.setItem("token", data.token);
-    localStorage.setItem("user", JSON.stringify(data.user));
-    // Update authentication state
-    toast.success("Login successful");
-    onLogin(data);
-  } catch (error) {
-    console.error("Login Error:", error);
-    toast.error(error.message || "Something went wrong");
-  } finally {
-    setLoading(false);
-  }
-};
+    try {
+      setLoading(true);
+      const response = await fetch(
+        "https://ams-backend-ktz1.onrender.com/api/auth/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            email,
+            password,
+          }),
+        }
+      );
+      const data = await response.json();
+      console.log("USER DATA:", data);
+      if (!response.ok) {
+        throw new Error(data.message || "Login failed");
+      }
+      // Store authentication data
+      localStorage.setItem("token", data.token);
+      localStorage.setItem("user", JSON.stringify(data.user));
+      // Update authentication state
+      toast.success("Login successful");
+      onLogin(data, data.user?.role);
+    } catch (error) {
+      console.error("Login Error:", error);
+      toast.error(error.message || "Something went wrong");
+    } finally {
+      setLoading(false);
+    }
+  };
 
 
   return (
@@ -54,18 +55,18 @@ const handleLogin = async () => {
       {/* Left Panel */}
       <div className="hidden md:flex md:w-1/2 bg-gradient-to-br from-[#021B34] to-[#0B2E4F] text-white items-center justify-center p-6">
         <div className="w-full max-w-lg">
-          <img 
-                src={logo} 
-                alt="AMS Logo" 
-                className="w-40 mx-auto mb-10 bg-white px-4 py-2 rounded-full"
-            />
+          <img
+            src={logo}
+            alt="AMS Logo"
+            className="w-40 mx-auto mb-10 bg-white px-4 py-2 rounded-full"
+          />
           <h1 className="text-3xl font-serif text-center mb-2">Anusandhan Management System</h1>
           <p className="text-gray-300 text-center mb-16">Research Management System</p>
           <div className="space-y-10 text-lg text-gray-200">
             {[
-              { icon: Layers, label: "Smart Research Workflow"  },
-              { icon: Users,  label: "Collaborative Review"     },
-              { icon: Shield, label: "Similarity Detection"     },
+              { icon: Layers, label: "Smart Research Workflow" },
+              { icon: Users, label: "Collaborative Review" },
+              { icon: Shield, label: "Similarity Detection" },
             ].map(({ icon: Icon, label }) => (
               <div key={label} className="flex items-center gap-4">
                 <Icon size={28} /><p>{label}</p>
@@ -112,9 +113,13 @@ const handleLogin = async () => {
 
           <button
             onClick={handleLogin}
-            className="w-full bg-blue-600 text-white py-2 rounded hover:bg-blue-700 transition"
+            disabled={loading}
+            className={`w-full py-2 rounded text-white transition ${loading
+                ? "bg-blue-400 cursor-not-allowed"
+                : "bg-blue-600 hover:bg-blue-700"
+              }`}
           >
-            Login now
+            {loading ? "Logging in..." : "Login now"}
           </button>
 
           <p className="text-center text-sm text-gray-400 mt-4">

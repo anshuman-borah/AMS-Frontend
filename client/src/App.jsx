@@ -5,82 +5,100 @@ import Login from "./pages/auth/Login";
 import Dashboard from "./pages/dashboard/Dashboard";
 import SubmitProposal from "./pages/proposals/SubmitProposal";
 import MyProposals from "./pages/proposals/MyProposals";
+import AdminDashboard from "./pages/admin/AdminDashboard";
+import ReviewerDashboard from "./pages/reviewer/Reviewerdashboard";
 
 export default function App() {
 
   const [loggedIn, setLoggedIn] = useState(
     localStorage.getItem("loggedIn") === "true"
   );
+  const [userRole, setUserRole] = useState(
+    localStorage.getItem("userRole") || "scientist"
+  );
 
-  // Auth Guard
-  const guard = (element) =>
-    loggedIn ? element : <Navigate to="/login" />;
-
-  // Login Handler
-  const handleLogin = () => {
+  const handleLogin = (data, role) => {
+    const normalizedRole = role?.toLowerCase() || "scientist";
     localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("userRole", normalizedRole);
     setLoggedIn(true);
+    setUserRole(normalizedRole);
   };
 
-  // Logout Handler
   const handleLogout = () => {
     localStorage.removeItem("loggedIn");
+    localStorage.removeItem("userRole");
     setLoggedIn(false);
+    setUserRole("scientist");
   };
 
   return (
     <BrowserRouter>
-
       <Routes>
 
-        {/* Login */}
+        {/* Login → redirect by role */}
         <Route
           path="/login"
           element={
-            loggedIn ? (
-              <Navigate to="/dashboard" />
-            ) : (
-              <Login onLogin={handleLogin} />
-            )
+            loggedIn
+              ? <Navigate to={
+                  userRole === "admin" ? "/admin" :
+                  userRole === "reviewer" ? "/reviewer" :
+                  "/dashboard"
+                } />
+              : <Login onLogin={handleLogin} />
           }
         />
 
-        {/* Dashboard */}
-        <Route
-          path="/dashboard"
-          element={guard(
-            <Dashboard onLogout={handleLogout} />
-          )}
-        />
+        {/* Scientist only */}
+        <Route path="/dashboard" element={
+          !loggedIn ? <Navigate to="/login" /> :
+          userRole === "admin" ? <Navigate to="/admin" /> :
+          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+          <Dashboard onLogout={handleLogout} />
+        } />
 
-        {/* Submit Proposal */}
-        <Route
-          path="/submit"
-          element={guard(
-            <SubmitProposal onLogout={handleLogout} />
-          )}
-        />
+        <Route path="/submit" element={
+          !loggedIn ? <Navigate to="/login" /> :
+          userRole === "admin" ? <Navigate to="/admin" /> :
+          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+          <SubmitProposal onLogout={handleLogout} />
+        } />
 
-        {/* My Proposals */}
-        <Route
-          path="/myproposals"
-          element={guard(
-            <MyProposals onLogout={handleLogout} />
-          )}
-        />
+        <Route path="/myproposals" element={
+          !loggedIn ? <Navigate to="/login" /> :
+          userRole === "admin" ? <Navigate to="/admin" /> :
+          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+          <MyProposals onLogout={handleLogout} />
+        } />
 
-        {/* Default Redirect */}
-        <Route
-          path="*"
-          element={
-            <Navigate
-              to={loggedIn ? "/dashboard" : "/login"}
-            />
-          }
-        />
+        {/* Admin only */}
+        <Route path="/admin" element={
+          !loggedIn ? <Navigate to="/login" /> :
+          userRole === "admin" ? <AdminDashboard onLogout={handleLogout} /> :
+          userRole === "reviewer" ? <Navigate to="/reviewer" /> :
+          <Navigate to="/dashboard" />
+        } />
+
+        {/* Reviewer only */}
+        <Route path="/reviewer" element={
+          !loggedIn ? <Navigate to="/login" /> :
+          userRole === "reviewer" ? <ReviewerDashboard onLogout={handleLogout} /> :
+          userRole === "admin" ? <Navigate to="/admin" /> :
+          <Navigate to="/dashboard" />
+        } />
+
+        {/* Catch-all */}
+        <Route path="*" element={
+          <Navigate to={
+            !loggedIn ? "/login" :
+            userRole === "admin" ? "/admin" :
+            userRole === "reviewer" ? "/reviewer" :
+            "/dashboard"
+          } />
+        } />
 
       </Routes>
-
     </BrowserRouter>
   );
 }
