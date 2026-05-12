@@ -22,6 +22,21 @@ import ReviewDetail from "./pages/reviewer pages/ReviewDetail";
 
 function getSavedRole() {
   try {
+import Dashboard      from "./pages/dashboard/Dashboard";
+import SubmitProposal from "./pages/proposals/SubmitProposal";
+import MyProposals    from "./pages/proposals/MyProposals";
+
+// Reviewer pages
+import ReviewerDashboard from "./pages/reviewer pages/ReviewerDashboard";
+import AssignedReviews   from "./pages/reviewer pages/AssignedReviews";
+import ReviewDetail      from "./pages/reviewer pages/ReviewDetail";
+
+// ── Helpers ──────────────────────────────────────────────────────────────────
+function getSavedRole() {
+  try {
+    // A token MUST exist for the session to be considered valid.
+    // Without this check, stale localStorage flags from a previous session
+    // would bypass the login page on every fresh visit.
     const token = localStorage.getItem("token");
     if (!token) return null;
 
@@ -63,6 +78,7 @@ export default function App() {
     setRole(null);
   };
 
+  // ── Guards ────────────────────────────────────────────────────────────────
   const scientistGuard = (element) =>
     role === "SCIENTIST" ? element : <Navigate to="/login" replace />;
 
