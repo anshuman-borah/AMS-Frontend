@@ -17,6 +17,18 @@ export default function Step2({ form, update }) {
 
       <FormField
         className="mb-6"
+        label="Proposal Type"
+        type="select"
+        value={form.proposalType}
+        onChange={update("proposalType")}
+        options={[
+          { value: "NEW", label: "New" },
+          { value: "ONGOING", label: "Ongoing" },
+        ]}
+      />
+
+      <FormField
+        className="mb-6"
         label="Introduction"
         type="textarea"
         value={form.introduction}

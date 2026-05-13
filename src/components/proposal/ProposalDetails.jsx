@@ -4,10 +4,10 @@ export default function ProposalDetails({ proposal, onBack }) {
   const objectives = proposal.objectives?.length
     ? proposal.objectives
     : [
-        "Develop machine learning models for disease prediction",
-        "Create an intuitive interface for medical professionals",
-        "Validate the system with clinical trials",
-      ];
+      "Develop machine learning models for disease prediction",
+      "Create an intuitive interface for medical professionals",
+      "Validate the system with clinical trials",
+    ];
 
   return (
     <div>
@@ -42,7 +42,7 @@ export default function ProposalDetails({ proposal, onBack }) {
 
               <Block
                 label="Principal Scientist"
-                value={proposal.principalScientist || "Dr. Sharma"}
+                value={proposal.submittedBy?.name || "N/A"}
               />
 
               <Block
@@ -52,7 +52,7 @@ export default function ProposalDetails({ proposal, onBack }) {
 
               <Block
                 label="Discipline"
-                value={proposal.discipline || "Computer Science"}
+                value={proposal.discipline?.replaceAll("_", " ") || "N/A"}
               />
 
               <div>
@@ -61,8 +61,7 @@ export default function ProposalDetails({ proposal, onBack }) {
                 </p>
 
                 <p className="text-gray-700 leading-7">
-                  {proposal.introduction ||
-                    "This research proposes to develop an advanced AI-based medical diagnosis system that leverages machine learning algorithms to assist healthcare professionals in making accurate diagnosis."}
+                  {proposal.introduction || "No introduction available"}
                 </p>
               </div>
 
@@ -80,7 +79,7 @@ export default function ProposalDetails({ proposal, onBack }) {
 
               <Block
                 label="Budget"
-                value={proposal.budget || "₹ 45.5 Lakhs"}
+                value={`₹ ${proposal.budget?.grandTotal || 0}`}
               />
 
             </div>
@@ -94,13 +93,12 @@ export default function ProposalDetails({ proposal, onBack }) {
             </h3>
 
             <textarea
-              placeholder="View the comment from the reviewer"
-              className="w-full h-40 border border-gray-200 rounded-lg p-4 resize-none focus:outline-none"
+              value={proposal.finalComment || "No review comment available"}
+              readOnly
+              className="w-full h-40 border border-gray-200 rounded-lg p-4 resize-none focus:outline-none bg-gray-50"
             />
 
-            <button className="mt-4 px-6 py-2 bg-green-500 hover:bg-green-600 text-white rounded-lg font-medium transition">
-              Edit
-            </button>
+
           </div>
         </div>
 
@@ -118,12 +116,23 @@ export default function ProposalDetails({ proposal, onBack }) {
               <span className="text-gray-600">Similarity Score</span>
 
               <span className="text-red-500 font-semibold">
-                {proposal.similarity}%
+                {proposal.similarityScore || 0}%
               </span>
             </div>
 
-            <div className="bg-yellow-100 text-yellow-700 text-xs px-3 py-2 rounded-full">
-              ⚠ Similar Projects detected
+            <div
+              className={`text-xs px-3 py-2 rounded-full ${proposal.similarityScore > 20
+                  ? "bg-red-100 text-red-700"
+                  : proposal.similarityScore > 0
+                    ? "bg-yellow-100 text-yellow-700"
+                    : "bg-green-100 text-green-700"
+                }`}
+            >
+              {proposal.similarityScore > 20
+                ? "⚠ High Similarity Detected"
+                : proposal.similarityScore > 0
+                  ? "⚠ Similar Projects Detected"
+                  : "✓ No Significant Similarity"}
             </div>
           </div>
 
@@ -138,32 +147,17 @@ export default function ProposalDetails({ proposal, onBack }) {
 
               <div className="bg-gray-50 rounded-lg p-4">
                 <p className="font-semibold text-sm">
-                  ML in HealthCare
+                   {proposal.assignedReviewer?.name || "No Reviewer Assigned"}
                 </p>
 
                 <p className="text-xs text-gray-500">
-                  Dr. Verma (2025)
+                {proposal.assignedReviewer?.email || "N/A"}
                 </p>
 
                 <p className="text-orange-500 text-xs mt-1">
-                  18% match
+                     {proposal.status?.replaceAll("_", " ")}
                 </p>
               </div>
-
-              <div className="bg-gray-50 rounded-lg p-4">
-                <p className="font-semibold text-sm">
-                  ML in HealthCare
-                </p>
-
-                <p className="text-xs text-gray-500">
-                  Dr. Verma (2025)
-                </p>
-
-                <p className="text-orange-500 text-xs mt-1">
-                  16% match
-                </p>
-              </div>
-
             </div>
           </div>
         </div>

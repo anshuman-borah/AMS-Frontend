@@ -10,7 +10,7 @@ export default function MyProposals({ onLogout }) {
   // Search
   const [search, setSearch] = useState("");
   // Selected proposal
-  const [selectedProposal, setSelected] = useState(null);
+  const [selectedProposal, setSelectedProposal] = useState(null);
   // API data
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -44,12 +44,44 @@ export default function MyProposals({ onLogout }) {
       setLoading(false);
     }
   };
+
+
+  const fetchProposalDetails = async (id) => {
+  try {
+    setLoading(true);
+
+    const token = localStorage.getItem("token");
+
+    const response = await axios.get(
+      `${import.meta.env.VITE_API_BASE_URL}/api/scientist/project/${id}`,
+      {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      }
+    );
+
+    setSelectedProposal(response.data);
+
+  } catch (error) {
+    console.log(error);
+  } finally {
+    setLoading(false);
+  }
+};
+
   // Search filter
-  const filtered = proposals.filter(
-    (p) =>
-      p.title?.toLowerCase().includes(search.toLowerCase()) ||
-      p.projectCode?.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = proposals.filter((p) => {
+    const term = search.toLowerCase();
+
+    return (
+      p.title?.toLowerCase().includes(term) ||
+      p.uniqueCode?.toLowerCase().includes(term) ||
+      p.status?.toLowerCase().includes(term) ||
+      p.discipline?.toLowerCase().includes(term) ||
+      p.id?.toLowerCase().includes(term)
+    );
+  });
 
   return (
 
@@ -90,7 +122,10 @@ export default function MyProposals({ onLogout }) {
                 id="search"
                 name="search"
                 value={search}
-                onChange={(e) => setSearch(e.target.value)}
+                onChange={(e) => {
+                  setSearch(e.target.value);
+                  setCurrentPage(1);
+                }}
                 placeholder="Search proposals..."
                 className="w-full pl-9 pr-4 py-2 border border-gray-300 rounded-lg text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400"
               />
@@ -103,7 +138,7 @@ export default function MyProposals({ onLogout }) {
 
             <div className="space-y-4">
 
-              {[...Array(5)].map((_, i) => (
+              {[...Array(LIMIT)].map((_, i) => (
                 <div
                   key={i}
                   className="h-16 bg-gray-200 rounded-xl animate-pulse"
@@ -118,7 +153,7 @@ export default function MyProposals({ onLogout }) {
               {/* Table */}
               <ProposalTable
                 proposals={filtered}
-                onView={setSelected}
+                onView={fetchProposalDetails}
               />
               {/* Pagination */}
               <div className="flex justify-center items-center gap-4 mt-6">
@@ -159,7 +194,7 @@ export default function MyProposals({ onLogout }) {
           ) : (
             <ProposalDetails
               proposal={selectedProposal}
-              onBack={() => setSelected(null)}
+              onBack={() => setSelectedProposal(null)}
             />
           )}
         </div>

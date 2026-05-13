@@ -28,7 +28,10 @@ export default function PrintableProposal({ form }) {
       {/* Basic Information */}
       <Section title="1. Basic Information">
         <TwoColRow label="Unique Code" value={form.uniqueCode} />
-        <TwoColRow label="Station" value={form.station} />
+        <TwoColRow
+          label="Station"
+          value={form.stationOrCollege}
+        />
         <TwoColRow label="Year" value={form.year} />
         <TwoColRow label="Teacher Name" value={form.teacherName} />
         <TwoColRow label="Discipline" value={form.discipline} />
@@ -59,20 +62,34 @@ export default function PrintableProposal({ form }) {
         <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
           <thead>
             <tr style={{ backgroundColor: "#1a3c6e", color: "#fff" }}>
-              <th style={thStyle}>Budget Item</th>
-              <th style={{ ...thStyle, textAlign: "right" }}>Amount (₹)</th>
+              <th style={thStyle}>Scientist Name</th>
+              <th style={thStyle}>Non Recurring</th>
+              <th style={thStyle}>Recurring Contingency</th>
             </tr>
           </thead>
+
           <tbody>
-            <BudgetRow label="Non-Recurring" value={form.nonRecurring} />
-            <BudgetRow label="Recurring Contingency" value={form.recurringContingency} shade />
-            <BudgetRow label="Travelling Allowances" value={form.travellingAllowances} />
-            <BudgetRow label="Operational Expenses" value={form.operationalExpenses} shade />
-            <BudgetRow label="Manpower" value={form.manpower} />
-            <tr style={{ backgroundColor: "#e8f0fe", fontWeight: "bold" }}>
-              <td style={tdStyle}>Total Budget</td>
-              <td style={{ ...tdStyle, textAlign: "right" }}>₹ {totalBudget}</td>
-            </tr>
+            {form.scientistInvolve.map((s, i) => (
+              <tr
+                key={i}
+                style={{
+                  backgroundColor:
+                    i % 2 === 0 ? "#fff" : "#f5f7fa",
+                }}
+              >
+                <td style={tdStyle}>
+                  {s.scientistName || "—"}
+                </td>
+
+                <td style={tdStyle}>
+                  ₹ {s.nonRecurring || 0}
+                </td>
+
+                <td style={tdStyle}>
+                  ₹ {s.recurringContingency || 0}
+                </td>
+              </tr>
+            ))}
           </tbody>
         </table>
       </Section>
@@ -82,20 +99,53 @@ export default function PrintableProposal({ form }) {
         <BlockRow label="" value={form.expectedOutcome} />
       </Section>
 
+    
       {/* Scientists */}
       <Section title="6. Scientists Involved">
-        <table style={{ width: "100%", borderCollapse: "collapse", fontSize: "13px" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "13px",
+          }}
+        >
           <thead>
-            <tr style={{ backgroundColor: "#1a3c6e", color: "#fff" }}>
-              <th style={thStyle}>Principal Investigator</th>
-              <th style={thStyle}>Co-Principal Investigator</th>
+            <tr
+              style={{
+                backgroundColor: "#1a3c6e",
+                color: "#fff",
+              }}
+            >
+              <th style={thStyle}>Scientist Name</th>
+
+              <th style={thStyle}>Non Recurring</th>
+
+              <th style={thStyle}>
+                Recurring Contingency
+              </th>
             </tr>
           </thead>
+
           <tbody>
-            {form.scientists.map((s, i) => (
-              <tr key={i} style={{ backgroundColor: i % 2 === 0 ? "#fff" : "#f5f7fa" }}>
-                <td style={tdStyle}>{s.principal || "—"}</td>
-                <td style={tdStyle}>{s.coPrincipal || "—"}</td>
+            {form.scientistInvolve.map((s, i) => (
+              <tr
+                key={i}
+                style={{
+                  backgroundColor:
+                    i % 2 === 0 ? "#fff" : "#f5f7fa",
+                }}
+              >
+                <td style={tdStyle}>
+                  {s.scientistName || "—"}
+                </td>
+
+                <td style={tdStyle}>
+                  ₹ {s.nonRecurring || 0}
+                </td>
+
+                <td style={tdStyle}>
+                  ₹ {s.recurringContingency || 0}
+                </td>
               </tr>
             ))}
           </tbody>

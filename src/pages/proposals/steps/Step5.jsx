@@ -1,5 +1,6 @@
 import { Plus, X } from "lucide-react";
 import FormField from "../../../components/common/FormField";
+import { toast } from "react-hot-toast";
 
 export default function Step5({
   form,
@@ -14,6 +15,7 @@ export default function Step5({
         <h2 className="text-3xl font-bold text-gray-900 mb-4">
           Outcome
         </h2>
+
         <FormField
           label="Expected Outcome"
           value={form.expectedOutcome}
@@ -21,11 +23,12 @@ export default function Step5({
           placeholder="Enter expected outcome"
         />
       </div>
+
       {/* Scientists */}
       <div>
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-3xl font-bold text-gray-900">
-            Scientists involved
+            Scientists Involved
           </h2>
 
           <button
@@ -39,13 +42,13 @@ export default function Step5({
         </div>
 
         <div className="space-y-6">
-          {form.scientists.map((scientist, index) => (
+          {form.scientistInvolve.map((scientist, index) => (
             <div
               key={index}
               className="border border-gray-200 rounded-xl p-4 relative"
             >
               {/* Remove */}
-              {form.scientists.length > 1 && (
+              {form.scientistInvolve.length > 1 && (
                 <button
                   type="button"
                   onClick={() => removeScientist(index)}
@@ -57,30 +60,54 @@ export default function Step5({
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
-                {/* Principal Investigator */}
+                {/* Scientist Name */}
                 <FormField
-                  label="Principal Investigator"
-                  value={scientist.principal}
+                  label="Scientist Name"
+                  value={scientist.scientistName}
                   onChange={(value) => {
-                    const updated = [...form.scientists];
-                    updated[index].principal = value;
+                    const updated = [...form.scientistInvolve];
 
-                    update("scientists")(updated);
+                    updated[index].scientistName = value;
+
+                    update("scientistInvolve")(updated);
                   }}
-                  placeholder="Enter name"
+                  placeholder="Enter scientist name"
                 />
 
-                {/* Co-Principal Investigator */}
+                {/* Non Recurring */}
                 <FormField
-                  label="Co-Principal Investigator"
-                  value={scientist.coPrincipal}
+                  label="Non Recurring"
+                  value={scientist.nonRecurring}
                   onChange={(value) => {
-                    const updated = [...form.scientists];
-                    updated[index].coPrincipal = value;
+                    if (/^\d*\.?\d*$/.test(value)) {
+                      const updated = [...form.scientistInvolve];
 
-                    update("scientists")(updated);
+                      updated[index].nonRecurring = value;
+
+                      update("scientistInvolve")(updated);
+                    } else {
+                      toast.error("Only Numbers are allowed");
+                    }
                   }}
-                  placeholder="Enter name"
+                  placeholder="Enter amount"
+                />
+
+                {/* Recurring Contingency */}
+                <FormField
+                  label="Recurring Contingency"
+                  value={scientist.recurringContingency}
+                  onChange={(value) => {
+                    if (/^\d*\.?\d*$/.test(value)) {
+                      const updated = [...form.scientistInvolve];
+
+                      updated[index].recurringContingency = value;
+
+                      update("scientistInvolve")(updated);
+                    } else {
+                      toast.error("Only Numbers are allowed");
+                    }
+                  }}
+                  placeholder="Enter amount"
                 />
               </div>
             </div>

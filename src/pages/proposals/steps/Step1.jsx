@@ -1,8 +1,10 @@
 import FormField from "../../../components/common/FormField";
 
 const STATION_OPTIONS = [
-  { value: "station1", label: "Station 1" },
-  { value: "station2", label: "Station 2" },
+  {
+    value: "Assam Agricultural University",
+    label: "Assam Agricultural University",
+  },
 ];
 
 const YEAR_OPTIONS = [
@@ -12,10 +14,15 @@ const YEAR_OPTIONS = [
 ];
 
 const DISCIPLINE_OPTIONS = [
-  { value: "agriculture", label: "Agriculture" },
-  { value: "biology", label: "Biology" },
-  { value: "chemistry", label: "Chemistry" },
-  { value: "physics", label: "Physics" },
+  { value: "COMPUTER_SCIENCE", label: "Computer Science" },
+  { value: "AGRICULTURE", label: "Agriculture" },
+  { value: "BIOTECHNOLOGY", label: "Biotechnology" },
+  { value: "MECHANICAL", label: "Mechanical" },
+  { value: "CIVIL", label: "Civil" },
+  { value: "Soil Science", label: "Soil Science" },
+  { value: "Crop Science", label: "Crop Science" },
+  { value: "Forestry", label: "Forestry" },
+  { value: "Food Technology", label: "Food Technology" },
 ];
 
 export default function Step1({ form, update }) {
@@ -29,15 +36,16 @@ export default function Step1({ form, update }) {
         <FormField
           className="flex-1"
           label="Unique Code"
-          value={`${Math.floor(100000 + Math.random() * 900000)}`}
+          value={form.uniqueCode || "Auto Generated"}
           disabled
         />
 
         <FormField
           className="flex-1"
           label="Stations / Colleges"
-          value={form.station}
-          onChange={update("station")}
+          type="select"
+          value={form.stationOrCollege}
+          onChange={update("stationOrCollege")}
           options={STATION_OPTIONS}
         />
 
@@ -65,6 +73,7 @@ export default function Step1({ form, update }) {
       <FormField
         className="mb-10"
         label="Discipline"
+        type="select"
         value={form.discipline}
         onChange={update("discipline")}
         options={DISCIPLINE_OPTIONS}
