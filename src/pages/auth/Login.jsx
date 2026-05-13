@@ -34,9 +34,8 @@ export default function Login({ onLogin }) {
       localStorage.setItem("user", JSON.stringify(data.user));
 
       toast.success("Login successful");
-
-      // Pass the full response — App.jsx will redirect based on role
-      onLogin(data);
+      onLogin(data, data.user?.role);
+      
     } catch (error) {
       console.error("Login Error:", error);
       toast.error(error.message || "Something went wrong");
