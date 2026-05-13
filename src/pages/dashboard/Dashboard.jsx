@@ -16,6 +16,9 @@ export default function Dashboard({ onLogout }) {
   const [stats, setStats] = useState(null);
   const [proposals, setProposals] = useState([]);
   const [loading, setLoading] = useState(true);
+  // filtering and view
+  const [statusFilter, setStatusFilter] = useState("ALL");
+  const [viewMode, setViewMode] = useState("list");
 
 
   useEffect(() => {
@@ -47,9 +50,21 @@ export default function Dashboard({ onLogout }) {
 
 
 
-  const filtered = proposals.filter(
-    (p) => !search || p.title.toLowerCase().includes(search.toLowerCase()) || p.id.toLowerCase().includes(search.toLowerCase())
-  );
+  const filtered = proposals.filter((p) => {
+    const term = search.toLowerCase();
+
+    const matchesSearch =
+      p.title?.toLowerCase().includes(term) ||
+      p.uniqueCode?.toString().toLowerCase().includes(term) ||
+      p.status?.toLowerCase().includes(term) ||
+      p.discipline?.toLowerCase().includes(term);
+
+    const matchesFilter =
+      statusFilter === "ALL" ||
+      p.status === statusFilter;
+
+    return matchesSearch && matchesFilter;
+  });
   if (loading) {
     return (
       <div className="flex min-h-screen font-sans bg-gray-100">
@@ -78,23 +93,48 @@ export default function Dashboard({ onLogout }) {
                 <input
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  placeholder="Search tickets..."
+                  placeholder="Search proposals..."
                   className="bg-transparent outline-none text-sm w-full"
                 />
               </div>
-              <button className="flex items-center gap-1 border rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50">
-                <Filter size={14} /> Filter
+
+              <button
+                onClick={() => {
+                  if (statusFilter === "ALL") setStatusFilter("APPROVED");
+                  else if (statusFilter === "APPROVED") setStatusFilter("REJECTED");
+                  else if (statusFilter === "REJECTED") setStatusFilter("UNDER_REVIEW");
+                  else if (statusFilter === "UNDER_REVIEW") setStatusFilter("REVISION_REQUIRED");
+                  else if (statusFilter === "REVISION_REQUIRED") setStatusFilter("SUBMITTED");
+                  else if (statusFilter === "SUBMITTED") setStatusFilter("DRAFT");
+                  else setStatusFilter("ALL");
+                }}
+                className="flex items-center gap-1 border rounded-lg px-3 py-1.5 text-sm text-gray-500 hover:bg-gray-50"
+              >
+                <Filter size={14} />
+                {statusFilter}
               </button>
+
               <div className="flex items-center border rounded-lg overflow-hidden">
-                {[List, LayoutGrid, Calendar].map((Icon, i) => (
-                  <button key={i} className="p-1.5 hover:bg-gray-100"><Icon size={16} className="text-gray-500" /></button>
+                {[
+                  { icon: List, mode: "list" },
+                  { icon: LayoutGrid, mode: "grid" },
+                  { icon: Calendar, mode: "calendar" },
+                ].map(({ icon: Icon, mode }) => (
+                  <button
+                    key={mode}
+                    onClick={() => setViewMode(mode)}
+                    className={`p-1.5 hover:bg-gray-100 ${viewMode === mode ? "bg-gray-200" : ""
+                      }`}
+                  >
+                    <Icon size={16} className="text-gray-500" />
+                  </button>
                 ))}
               </div>
             </div>
           </div>
 
           {/* Stat Cards */}
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-8">
             <StatCard
               label="Total Proposals"
               value={stats?.total || 0}
@@ -104,8 +144,17 @@ export default function Dashboard({ onLogout }) {
             />
 
             <StatCard
-              label="Pending Reviews"
-              value={stats?.pending || 0}
+              label="Submitted"
+              value={stats?.submitted || 0}
+              icon={Clock}
+              color="text-blue-500"
+              bg="bg-blue-50"
+            />
+
+
+            <StatCard
+              label="Under Review"
+              value={stats?.underReview || 0}
               icon={Clock}
               color="text-yellow-500"
               bg="bg-yellow-50"
@@ -126,6 +175,14 @@ export default function Dashboard({ onLogout }) {
               color="text-red-500"
               bg="bg-red-50"
             />
+
+            <StatCard
+              label="Revision Required"
+              value={stats?.revisionRequired || 0}
+              icon={Clock}
+              color="text-orange-500"
+              bg="bg-orange-50"
+            />
           </div>
 
           {/* Table */}
@@ -140,24 +197,31 @@ export default function Dashboard({ onLogout }) {
                 </tr>
               </thead>
               <tbody>
-                {filtered.map((p, i) => (
-                  <tr key={i} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
-                    <td className="py-3 pr-4 text-gray-600 font-medium">{p.id?.slice(-6).toUpperCase() || "0"}</td>
+                {filtered.map((p) => (
+                  <tr key={p.id} className="border-b last:border-0 hover:bg-gray-50 transition-colors">
+                    <td className="py-3 pr-4 text-gray-600 font-medium">{p.uniqueCode || "N/A"}</td>
                     <td className="py-3 pr-4 text-gray-700">{p.title}</td>
                     <td className="py-3 pr-4">
                       <span
-                        className={`text-xs font-semibold px-2 py-0.5 rounded-full ${p.status === "APPROVED"
-                          ? "bg-green-100 text-green-700"
-                          : p.status === "REJECTED"
-                            ? "bg-red-100 text-red-700"
-                            : "bg-yellow-100 text-yellow-700"
+                        className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold ${p.status === "APPROVED"
+                            ? "bg-green-100 text-green-800"
+                            : p.status === "REJECTED"
+                              ? "bg-red-100 text-red-800"
+                              : p.status === "REVISION_REQUIRED"
+                                ? "bg-orange-100 text-orange-800"
+                                : p.status === "UNDER_REVIEW"
+                                  ? "bg-blue-100 text-blue-800"
+                                  : p.status === "SUBMITTED"
+                                    ? "bg-indigo-100 text-indigo-800"
+                                    : "bg-yellow-100 text-yellow-800"
                           }`}
                       >
-                        {p.status}
-                      </span>                    </td>
+                        {p.status?.replaceAll("_", " ")}
+                      </span>
+                    </td>
                     <td className="py-3 pr-4"><SimilarityBadge value={p.similarityScore || 0} /></td>
-                    <td className="py-3 pr-4 text-gray-500">{p.submittedDate ? new Date(p.submittedDate).toLocaleDateString() : "0"}</td>
-                    <td className="py-3 text-gray-500"> {p.discipline || "Not specified"} </td>
+                    <td className="py-3 pr-4 text-gray-500">{p.submittedDate ? new Date(p.submittedDate).toLocaleDateString("en-IN") : "0"}</td>
+                    <td className="py-3 text-gray-500"> {p.discipline?.replaceAll("_", " ") || "Not specified"} </td>
                   </tr>
                 ))}
               </tbody>

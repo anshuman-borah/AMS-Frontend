@@ -1,20 +1,15 @@
 export default function RecentReviews({ reviews }) {
   return (
     <div className="bg-white border border-gray-100 rounded-xl shadow-sm overflow-hidden">
-
       <p className="px-6 py-4 border-b border-gray-100 text-sm font-semibold text-gray-700">
         Recent Reviews
       </p>
-
       <div className="divide-y divide-gray-50">
-
         {reviews.map((r, i) => (
-
           <div
             key={i}
             className="px-6 py-4 hover:bg-gray-50 transition-colors"
           >
-
             <div className="flex items-start justify-between gap-3 mb-1.5">
 
               <p className="text-xs font-medium text-gray-800 leading-snug">

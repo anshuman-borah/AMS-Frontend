@@ -1,16 +1,7 @@
 /**
  * FormField — renders a label + input, select, or textarea.
- *
- * Props:
- *   label      string   — field label
- *   type       string   — "text" | "email" | "select" | "textarea" (default "text")
- *   value      string
- *   onChange   fn(value)
- *   placeholder string
- *   options    [{ value, label }]  — only for type="select"
- *   rows       number             — only for type="textarea"
- *   className  string             — extra wrapper classes
  */
+
 export default function FormField({
   label,
   type = "text",
@@ -20,21 +11,31 @@ export default function FormField({
   options = [],
   rows = 3,
   className = "",
+  disabled = false,
 }) {
   const base =
     "w-full border border-gray-300 rounded-lg px-3 py-2 text-sm placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-400";
 
   return (
     <div className={className}>
-      <label className="block text-sm text-gray-600 mb-1">{label}</label>
+      {label && (
+        <label className="block text-sm text-gray-600 mb-1">
+          {label}
+        </label>
+      )}
 
       {type === "select" ? (
         <select
+          size={1}
           value={value}
           onChange={(e) => onChange(e.target.value)}
-          className={`${base} text-gray-500`}
+          className={`${base} text-gray-700 h-11 bg-white`}
         >
-          <option value="">Auto-Generated</option>
+          {/* Hidden placeholder */}
+          <option value="" disabled hidden>
+            Select {label}
+          </option>
+
           {options.map((opt) => (
             <option key={opt.value} value={opt.value}>
               {opt.label}
@@ -55,6 +56,7 @@ export default function FormField({
           value={value}
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
+          disabled={disabled}
           className={base}
         />
       )}

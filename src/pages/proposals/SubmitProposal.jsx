@@ -25,6 +25,7 @@ export default function SubmitProposal({ onLogout }) {
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
 
+
   const {
     form,
     update,
@@ -32,6 +33,7 @@ export default function SubmitProposal({ onLogout }) {
     addScientist,
     removeScientist,
   } = useProposalForm();
+  const [pdfForm, setPdfForm] = useState(form);
 
   // const handleSubmit = () => generateProposalPDF(printRef, form);
   // create post interagtion
@@ -42,29 +44,43 @@ export default function SubmitProposal({ onLogout }) {
       // adding the payload 
       const payload = {
         title: form.title,
+        proposalType: form.proposalType,
+        stationOrCollege: form.stationOrCollege,
         discipline: form.discipline,
-        year: Number(form.year),
+        year: parseInt(form.year) || 2026,
+
         introduction: form.introduction,
         actionPlan: form.actionPlan,
         expectedOutcome: form.expectedOutcome,
+
         objectives: form.objectives,
+
         budget: {
           nonRecurring:
             Number(form.nonRecurring) || 0,
-          recurring:
+
+          recurringContingency:
             Number(form.recurringContingency) || 0,
-          travel:
+
+          travellingAllowances:
             Number(form.travellingAllowances) || 0,
-          operational:
+
+          operationalExpenses:
             Number(form.operationalExpenses) || 0,
+
           manpower:
             Number(form.manpower) || 0,
-          total:
-            (Number(form.nonRecurring) || 0) +
-            (Number(form.recurringContingency) || 0) +
-            (Number(form.travellingAllowances) || 0) +
-            (Number(form.operationalExpenses) || 0),
         },
+
+        scientistInvolve: form.scientistInvolve.map((s) => ({
+          scientistName: s.scientistName,
+
+          nonRecurring:
+            Number(s.nonRecurring) || 0,
+
+          recurringContingency:
+            Number(s.recurringContingency) || 0,
+        })),
       };
       const response = await fetch(
         `${import.meta.env.VITE_API_BASE_URL}/api/projects/create`,
@@ -81,6 +97,7 @@ export default function SubmitProposal({ onLogout }) {
       console.log("STATUS:", response.status);
       console.log("DATA:", data);
 
+
       if (
         !response.ok ||
         data.message === "Please fill all required fields"
@@ -89,7 +106,18 @@ export default function SubmitProposal({ onLogout }) {
           data.message || "Failed to submit proposal"
         );
       }
-      generateProposalPDF(printRef, form);
+
+      const updatedForm = {
+        ...form,
+        uniqueCode: data.project.uniqueCode,
+      };
+
+      setPdfForm(updatedForm);
+
+      await new Promise((resolve) => setTimeout(resolve, 100));
+
+      await generateProposalPDF(printRef, updatedForm);
+
       toast.success("Proposal submitted successfully");
       setTimeout(() => {
         navigate("/dashboard");
@@ -123,7 +151,7 @@ export default function SubmitProposal({ onLogout }) {
           padding: "48px 52px",
         }}
       >
-        <PrintableProposal form={form} />
+        <PrintableProposal form={pdfForm} />
       </div>
 
       {/* ── Visible UI ── */}

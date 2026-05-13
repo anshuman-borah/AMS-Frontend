@@ -2,9 +2,12 @@ import SimilarityBadge from "./SimilarityBadge";
 
 
 const STATUS_STYLES = {
-  Accepted: "bg-green-100 text-green-700",
-  Rejected: "bg-red-100 text-red-700",
-  Pending:  "bg-yellow-100 text-yellow-700",
+  APPROVED: "bg-green-100 text-green-700",
+  REJECTED: "bg-red-100 text-red-700",
+  SUBMITTED: "bg-blue-100 text-blue-700",
+  DRAFT: "bg-yellow-100 text-yellow-700",
+  REVISION_REQUIRED: "bg-orange-100 text-orange-700",
+  UNDER_REVIEW: "bg-purple-100 text-purple-700",
 };
 
 export default function ProposalTable({ proposals, onView }) {
@@ -28,25 +31,27 @@ export default function ProposalTable({ proposals, onView }) {
         <tbody className="divide-y divide-gray-100">
           {proposals.length > 0 ? (
             proposals.map((proposal) => (
-              <tr key={proposal.id} className="hover:bg-gray-50 transition-colors">
+              <tr key={proposal.uniqueCode} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-gray-700">
-                  {proposal.id.slice(-6).toUpperCase()}
+                  {proposal.uniqueCode || "N/A"}
                 </td>
                 <td className="px-6 py-4 text-gray-600 max-w-xs truncate">
                   {proposal.title}
                 </td>
                 <td className="px-6 py-4">
                   <span className={`inline-block px-3 py-1 rounded-full text-xs font-semibold ${STATUS_STYLES[proposal.status] ?? "bg-gray-100 text-gray-600"}`}>
-                    {proposal.status}
+                    {proposal.status?.replaceAll("_", " ")}
                   </span>
                 </td>
                 <td className="px-6 py-4">
-                  <SimilarityBadge value={proposal.similarity} />
+                  <SimilarityBadge value={proposal.similarityScore || 0} />
                 </td>
-                <td className="px-6 py-4 text-gray-500">{proposal.submittedDate}</td>
+                <td className="px-6 py-4 text-gray-500">{proposal.createdAt
+                  ? new Date(proposal.createdAt).toLocaleDateString()
+                  : "N/A"}</td>
                 <td className="px-6 py-4">
                   <button
-                    onClick={() => onView(proposal)}
+                    onClick={() => onView(proposal.id)}
                     className="px-4 py-1.5 bg-green-500 hover:bg-green-600 text-white text-xs font-semibold rounded-lg transition"
                   >
                     View
