@@ -70,21 +70,7 @@ export default function AssignedReviews({ onLogout }) {
       const d = res.data;
       console.log("AssignedReviews API response:", d); // debug
 
-      /*
-        Handles multiple response shapes:
-        { projects: [...], totalPages, currentPage }   ← primary
-        { data: [...], totalPages, currentPage }       ← fallback
-        [...] (bare array)                             ← fallback
-      */
-      /*
-        Actual API shape:
-        {
-          projects: [...],
-          pagination: { currentPage, totalPages, totalItems, itemsPerPage }
-        }
-        Each project has: _id, title, discipline, status, similarityScore,
-          ownerId: { _id, name, email }, createdAt
-      */
+
       let list = [];
       if (Array.isArray(d)) list = d;
       else if (Array.isArray(d.projects)) list = d.projects;
@@ -165,8 +151,8 @@ export default function AssignedReviews({ onLogout }) {
                     key={tab.value}
                     onClick={() => handleTabChange(tab.value)}
                     className={`px-3 py-1 rounded-md text-xs font-semibold transition-all ${activeTab === tab.value
-                        ? "bg-white text-blue-600 shadow-sm"
-                        : "text-gray-500 hover:text-gray-700"
+                      ? "bg-white text-blue-600 shadow-sm"
+                      : "text-gray-500 hover:text-gray-700"
                       }`}
                   >
                     {tab.label}
@@ -250,24 +236,36 @@ export default function AssignedReviews({ onLogout }) {
               </table>
             </div>
 
+            
             {/* ── Pagination ─────────────────────────────────────────── */}
             {totalPages > 1 && (
-              <div className="flex justify-between items-center mt-4 text-sm text-gray-500">
+              <div className="flex justify-center items-center gap-4 mt-6">
+
+                {/* Previous */}
                 <button
-                  disabled={page === 1}
-                  onClick={() => setPage((p) => p - 1)}
-                  className="px-3 py-1 rounded border disabled:opacity-40 hover:bg-gray-50"
+                  onClick={() =>
+                    setPage((prev) => Math.max(prev - 1, 1))
+                  }
+                  disabled={page === 1 || loading}
+                  className="px-4 py-2 border rounded-lg disabled:opacity-50"
                 >
-                  ← Prev
+                  Previous
                 </button>
-                <span>Page {page} of {totalPages}</span>
+
+                {/* Page Info */}
+                <span className="font-medium text-sm text-gray-600">
+                  Page {page} of {totalPages}
+                </span>
+
+                {/* Next */}
                 <button
-                  disabled={page >= totalPages}
-                  onClick={() => setPage((p) => p + 1)}
-                  className="px-3 py-1 rounded border disabled:opacity-40 hover:bg-gray-50"
+                  onClick={() => setPage((prev) => prev + 1)}
+                  disabled={page >= totalPages || loading}
+                  className="px-4 py-2 border rounded-lg bg-blue-600 text-white disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  Next →
+                  Next
                 </button>
+
               </div>
             )}
           </div>
