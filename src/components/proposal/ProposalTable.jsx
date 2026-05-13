@@ -30,7 +30,7 @@ export default function ProposalTable({ proposals, onView }) {
             proposals.map((proposal) => (
               <tr key={proposal.id} className="hover:bg-gray-50 transition-colors">
                 <td className="px-6 py-4 font-medium text-gray-700">
-                  {proposal.projectCode}
+                  {proposal.id.slice(-6).toUpperCase()}
                 </td>
                 <td className="px-6 py-4 text-gray-600 max-w-xs truncate">
                   {proposal.title}

@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { LayoutDashboard, ClipboardList, LogOut, CheckCircle, Clock, XCircle, FileStack } from "lucide-react";
 import axios from "axios";
-
 const NAV_ITEMS = [
   { label: "Dashboard", icon: LayoutDashboard, path: "/reviewer" },
   { label: "Assigned Proposals", icon: ClipboardList, path: "/reviewer/proposals" },
