@@ -1,11 +1,12 @@
 import { useState } from "react";
 
 export default function useProposalForm() {
+  const user = JSON.parse(localStorage.getItem("user"));
   const [form, setForm] = useState({
     uniqueCode: "",
     stationOrCollege: "",
     year: "",
-    teacherName: "",
+    teacherName: user?.name || "",
     discipline: "",
 
     title: "",
@@ -26,7 +27,7 @@ export default function useProposalForm() {
 
     scientistInvolve: [
       {
-        scientistName: "",
+        scientistName: user?.name || "",
         nonRecurring: "",
         recurringContingency: "",
       },

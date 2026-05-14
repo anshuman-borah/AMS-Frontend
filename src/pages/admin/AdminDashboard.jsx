@@ -66,8 +66,8 @@ export default function AdminDashboard({ onLogout, user }) {
       bg: "bg-purple-100",
     },
     {
-      label: "Pending",
-      value: dashboardData?.statistics?.projects?.pending || 0,
+      label: "Submitted",
+      value: dashboardData?.statistics?.projects?.submitted || 0,
       icon: Clock,
       color: "text-yellow-600",
       bg: "bg-yellow-100",
@@ -97,7 +97,7 @@ export default function AdminDashboard({ onLogout, user }) {
 
   return (
     <div className="flex min-h-screen bg-gray-50">
-      
+
       {/* Sidebar */}
       <AdminSidebar
         onLogout={onLogout}
