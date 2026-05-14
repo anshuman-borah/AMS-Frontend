@@ -3,11 +3,15 @@ import axios from "axios";
 
 import {
   FolderOpen,
-  FileText,
   Clock,
   CheckCircle,
   XCircle,
   UserCheck,
+  Users,
+  FlaskConical,
+  TrendingUp,
+  FileText,
+  Activity,
 } from "lucide-react";
 
 import StatCard from "../../components/common/StatCard";
@@ -41,7 +45,7 @@ export default function AdminDashboard({ onLogout, user }) {
 
         setDashboardData(res.data);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch admin dashboard:", err);
       } finally {
         setLoading(false);
       }
@@ -57,13 +61,6 @@ export default function AdminDashboard({ onLogout, user }) {
       icon: FolderOpen,
       color: "text-blue-600",
       bg: "bg-blue-100",
-    },
-    {
-      label: "Draft",
-      value: dashboardData?.statistics?.projects?.draft || 0,
-      icon: FileText,
-      color: "text-purple-600",
-      bg: "bg-purple-100",
     },
     {
       label: "Submitted",
@@ -96,7 +93,7 @@ export default function AdminDashboard({ onLogout, user }) {
   ];
 
   return (
-    <div className="flex min-h-screen bg-gray-50">
+    <div className="flex h-screen bg-gray-50">
 
       {/* Sidebar */}
       <AdminSidebar
@@ -126,7 +123,7 @@ export default function AdminDashboard({ onLogout, user }) {
             <DashboardHeader />
 
             {/* Stats */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6 gap-4 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4 mb-8">
 
               {STATS.map((s) => (
                 <StatCard
@@ -139,6 +136,79 @@ export default function AdminDashboard({ onLogout, user }) {
                 />
               ))}
 
+            </div>
+
+            {/* Platform Overview Banner */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+              <div className="flex items-center gap-3 mb-5">
+                <div className="p-2 bg-gradient-to-br from-violet-500 to-purple-600 rounded-lg">
+                  <Activity className="w-5 h-5 text-white" />
+                </div>
+                <h3 className="text-lg font-semibold text-gray-900">
+                  Platform Overview
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                {/* Total Users */}
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div className="p-3 bg-violet-100 rounded-xl">
+                    <Users className="w-6 h-6 text-violet-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {dashboardData?.statistics?.users?.total || 0}
+                    </p>
+                    <p className="text-sm text-gray-500 font-medium">Total Users</p>
+                  </div>
+                </div>
+
+                {/* Scientists */}
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div className="p-3 bg-purple-100 rounded-xl">
+                    <FlaskConical className="w-6 h-6 text-purple-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {dashboardData?.statistics?.users?.scientists || 0}
+                    </p>
+                    <p className="text-sm text-gray-500 font-medium">Scientists</p>
+                  </div>
+                </div>
+
+                {/* Admins */}
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div className="p-3 bg-amber-100 rounded-xl">
+                    <UserCheck className="w-6 h-6 text-amber-600" />
+                  </div>
+                  <div>
+                    <p className="text-2xl font-bold text-gray-900">
+                      {dashboardData?.statistics?.users?.admins || 0}
+                    </p>
+                    <p className="text-sm text-gray-500 font-medium">Admins</p>
+                  </div>
+                </div>
+
+                {/* Review Stats */}
+                <div className="flex items-center gap-4 p-4 bg-gray-50 rounded-xl hover:bg-gray-100 transition-colors">
+                  <div className="p-3 bg-emerald-100 rounded-xl">
+                    <TrendingUp className="w-6 h-6 text-emerald-600" />
+                  </div>
+                  <div>
+                    <div className="flex items-baseline gap-2">
+                      <p className="text-2xl font-bold text-gray-900">
+                        {dashboardData?.statistics?.reviews?.total || 0}
+                      </p>
+                      <span className="text-sm font-semibold text-emerald-600">
+                        {dashboardData?.statistics?.reviews?.approvalRate || 0}%
+                      </span>
+                    </div>
+                    <p className="text-sm text-gray-500 font-medium">
+                      Reviews <span className="text-emerald-600">• Approval Rate</span>
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
 
             {/* Charts */}
