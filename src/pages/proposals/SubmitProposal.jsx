@@ -177,11 +177,16 @@ export default function SubmitProposal({ onLogout }) {
             <ProposalTypeSelector
               onNew={() => {
                 setProposalMode("new");
+
+                update("proposalType")("NEW");
+
                 setCurrentStep(1);
               }}
 
               onContinue={() => {
                 setProposalMode("existing");
+
+                update("proposalType")("ONGOING");
 
                 const savedStep =
                   Number(localStorage.getItem("proposalStep")) || 1;
