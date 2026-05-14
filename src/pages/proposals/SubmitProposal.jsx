@@ -1,4 +1,4 @@
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Sidebar from "../../components/common/Sidebar";
 import Stepper from "../../components/common/Stepper";
 import Step1 from "./steps/Step1";
@@ -7,6 +7,7 @@ import Step3 from "./steps/Step3";
 import Step4 from "./steps/Step4";
 import Step5 from "./steps/Step5";
 import PrintableProposal from "../../components/proposal/PrintableProposal";
+import ProposalTypeSelector from "../../components/proposal/ProposalTypeSelector";
 import useProposalForm from "../../hooks/useProposalForm";
 import { generateProposalPDF } from "../../utils/generateProposalPDF";
 import toast from "react-hot-toast";
@@ -21,9 +22,16 @@ const STEPS = [
 
 export default function SubmitProposal({ onLogout }) {
   const printRef = useRef();
-  const [currentStep, setCurrentStep] = useState(1);
+  const [proposalMode, setProposalMode] = useState(null);
+  const [currentStep, setCurrentStep] = useState(0);
   const [submitting, setSubmitting] = useState(false);
   const navigate = useNavigate();
+
+  useEffect(() => {
+    if (currentStep > 0) {
+      localStorage.setItem("proposalStep", currentStep);
+    }
+  }, [currentStep]);
 
 
   const {
@@ -164,56 +172,96 @@ export default function SubmitProposal({ onLogout }) {
             Complete all steps to submit your proposal for review
           </p>
 
-          <Stepper
-            steps={STEPS}
-            currentStep={currentStep}
-            onStepClick={setCurrentStep}
-          />
+          {currentStep === 0 ? (
 
-          {currentStep === 1 && <Step1 form={form} update={update} />}
-          {currentStep === 2 && <Step2 form={form} update={update} />}
-          {currentStep === 3 && (
-            <Step3 form={form} update={update} addObjective={addObjective} />
-          )}
-          {currentStep === 4 && <Step4 form={form} update={update} />}
-          {currentStep === 5 && (
-            <Step5
-              form={form}
-              update={update}
-              addScientist={addScientist}
-              removeScientist={removeScientist}
+            <ProposalTypeSelector
+              onNew={() => {
+                setProposalMode("new");
+                setCurrentStep(1);
+              }}
+
+              onContinue={() => {
+                setProposalMode("existing");
+
+                const savedStep =
+                  Number(localStorage.getItem("proposalStep")) || 1;
+
+                setCurrentStep(savedStep);
+              }}
             />
+
+          ) : (
+
+            <>
+              <Stepper
+                steps={STEPS}
+                currentStep={currentStep}
+                onStepClick={setCurrentStep}
+              />
+
+              {currentStep === 1 && (
+                <Step1 form={form} update={update} />
+              )}
+
+              {currentStep === 2 && (
+                <Step2 form={form} update={update} />
+              )}
+
+              {currentStep === 3 && (
+                <Step3
+                  form={form}
+                  update={update}
+                  addObjective={addObjective}
+                />
+              )}
+
+              {currentStep === 4 && (
+                <Step4 form={form} update={update} />
+              )}
+
+              {currentStep === 5 && (
+                <Step5
+                  form={form}
+                  update={update}
+                  addScientist={addScientist}
+                  removeScientist={removeScientist}
+                />
+              )}
+            </>
+
           )}
 
           {/* Navigation */}
-          <div className="flex justify-between mt-8">
-            <button
-              onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
-              className="px-8 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition"
-            >
-              Previous
-            </button>
+          {currentStep !== 0 && (
+            <div className="flex justify-between mt-8">
+              <button
+                onClick={() => setCurrentStep((s) => Math.max(1, s - 1))}
+                className="px-8 py-2 rounded-lg border-2 border-blue-600 text-blue-600 font-semibold hover:bg-blue-50 transition"
+              >
+                Previous
+              </button>
 
-            {currentStep === 5 ? (
-              <button
-                onClick={handleSubmit}
-                disabled={submitting}
-                className={`px-8 py-2 rounded-lg text-white font-semibold transition ${submitting
-                  ? "bg-gray-400 cursor-not-allowed"
-                  : "bg-green-600 hover:bg-green-700"
-                  }`}
-              >
-                {submitting ? "Submitting..." : "Submit Proposal"}
-              </button>
-            ) : (
-              <button
-                onClick={() => setCurrentStep((s) => Math.min(5, s + 1))}
-                className="px-8 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
-              >
-                Save & Next
-              </button>
-            )}
-          </div>
+              {currentStep === 5 ? (
+                <button
+                  onClick={handleSubmit}
+                  disabled={submitting}
+                  className={`px-8 py-2 rounded-lg text-white font-semibold transition ${submitting
+                    ? "bg-gray-400 cursor-not-allowed"
+                    : "bg-green-600 hover:bg-green-700"
+                    }`}
+                >
+                  {submitting ? "Submitting..." : "Submit Proposal"}
+                </button>
+              ) : (
+                <button
+                  onClick={() => setCurrentStep((s) => Math.min(5, s + 1))}
+                  className="px-8 py-2 rounded-lg bg-blue-600 text-white font-semibold hover:bg-blue-700 transition"
+                >
+                  Save & Next
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </main>
     </div>
