@@ -26,6 +26,7 @@ export default function Step2({ form, update }) {
         readOnly
       />
 
+
       <FormField
         className="mb-6"
         label="Introduction"
